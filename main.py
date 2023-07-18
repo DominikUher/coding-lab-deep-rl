@@ -24,10 +24,11 @@ algorithm_improvements = {  # Choose which improvements to use
     'boltzmann_exploration': False,
     'noisy_nets': False
 }
-algorithm_parameters = {    # Choose algorithm hyperparameters here
+algorithm_parameters = {    # Choose hyperparameters here
     'seed': seed,
     'environment': Environment(variant, data_dir),
     'variant': variant,
+    'input_shape': (5, 5, 5),
     'lr_actor': 0.0005,
     'lr_critic_1': 0.0005,
     'lr_critic_2': 0.0005,
