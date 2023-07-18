@@ -2,26 +2,28 @@ from collections import deque
 import os
 import tensorflow as tf
 import numpy as np
-from main import env
 import random
-
-seed = 10
-os.environ['PYTHONHASHSEED'] = str(seed)
-
-tf.random.set_seed(seed)
-np.random.seed(seed)
-random.seed(seed)
 
 
 class PPO:
-    def __init__(self, variant, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
+    def __init__(self, seed, env, variant, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
                  no_of_actors, actor_updates_per_episode, critic_updates_per_episode, clip_annealing_factor):
-        self.agent = PPOAgent(variant, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
-                 no_of_actors)
+        self.agent = PPOAgent(variant, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors)
         self.env = env
         self.actor_updates_per_episode = actor_updates_per_episode
         self.critic_updates_per_episode = critic_updates_per_episode
         self.clip_annealing_factor = clip_annealing_factor
+        os.environ['PYTHONHASHSEED'] = str(seed)
+        tf.random.set_seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+
+    @classmethod
+    def from_dict(cls, d):
+        ppo = cls(d['seed'], d['environment'], d['variant'], d['lr_actor'], d['lr_critic_1'], d['lr_critic_2'],
+                  d['return_lambda'], d['gamma'], d['clip_epsilon'], d['episode_steps'], d['no_of_actors'],
+                  d['actor_updates_per_episode'], d['critic_updates_per_episode'], d['clip_annealing_factor'])
+        return ppo
 
     def train_ppo(self):
         self.run_ppo(mode='training')

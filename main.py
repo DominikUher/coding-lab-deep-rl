@@ -1,26 +1,50 @@
+import os
+import random
+import numpy as np
+import tensorflow as tf
+from codinglab_utils import make_algorithm
 from environment_dist_possible import Environment
-#from ACER import *
-from PPOtopGUN import *
-# TODO: parse arguments
-...
+
+# Setting seeds for reproducability
 seed = 10
-data_dir = './data'
-variant = 0
-env = Environment(variant, data_dir)
+os.environ['PYTHONHASHSEED'] = str(seed)
+random.seed(seed)
+np.random.seed(seed)
+tf.random.set_seed(seed)
 
-algo = 'PPO'
 
-# TODO: execute training
+# Declaring algorithm and environment parameters
+data_dir = './data'         # Only change if data directory changed
+variant = 0                 # Possible values: 0, 1, 2
+observation = 'Greedy'      # Possible values: 'Greedy', 'Neutral', 'Limited'?
+algorithm_name = 'PPO'      # Possible values: 'PPO', 'CNN', 'ACER'
+algorithm_improvements = {  # Choose which improvements to use
+    'clip_ratio_annealing': True,
+    'tanh_activations': True,
+    'boltzmann_exploration': False,
+    'noisy_nets': False
+}
+algorithm_parameters = {    # Choose algorithm hyperparameters here
+    'seed': seed,
+    'environment': Environment(variant, data_dir),
+    'variant': variant,
+    'lr_actor': 0.0005,
+    'lr_critic_1': 0.0005,
+    'lr_critic_2': 0.0005,
+    'return_lambda': 0.5,
+    'gamma': 0.95,
+    'clip_epsilon': 0.15,
+    'episode_steps': 200,
+    'no_of_actors': 30,
+    'actor_updates_per_episode': 200,
+    'critic_updates_per_episode': 200,
+    'clip_annealing_factor': 0.99
+}
 
-if __name__ == '__main__':
 
-    if algo == 'PPO':
-        algorithm = PPO(variant=variant, lr_actor=0.0005, lr_critic_1=0.0005, lr_critic_2=0.0005,
-                        return_lambda=0.5, gamma=0.95, clip_epsilon=0.15, episode_steps=200, no_of_actors=30,
-                        actor_updates_per_episode=200, critic_updates_per_episode=200, clip_annealing_factor=0.99)
-        algorithm.train_ppo()
+# Initializing algorithm and environment
+algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
 
-#    if algo == 'ACER':
-#        algorithm = ACER(variant=variant, data_dir='./data', lr_actor=0.0005, gamma=0.97, buffer_size=400, batch_size=200,
-#                 no_of_actors=40, lr_global=0.0001)
-#        algorithm.trainACER()
+
+# Train algorithm
+algorithm.train_ppo()
