@@ -2,8 +2,7 @@ import os
 import random
 import numpy as np
 import tensorflow as tf
-from codinglab_utils import make_algorithm
-from environment_dist_possible import Environment
+from codinglab_utils import make_algorithm, make_environment, calculate_input_shape
 
 # Setting seeds for reproducability
 seed = 10
@@ -16,7 +15,7 @@ tf.random.set_seed(seed)
 # Declaring algorithm and environment parameters
 data_dir = './data'         # Only change if data directory changed
 variant = 0                 # Possible values: 0, 1, 2
-observation = 'Greedy'      # Possible values: 'Greedy', 'Neutral', 'Limited'?
+observation = 'Neutral'      # Possible values: 'Greedy', 'Neutral', 'Limited'?
 algorithm_name = 'PPO'      # Possible values: 'PPO', 'CNN', 'ACER'
 algorithm_improvements = {  # Choose which improvements to use
     'clip_ratio_annealing': True,
@@ -26,9 +25,10 @@ algorithm_improvements = {  # Choose which improvements to use
 }
 algorithm_parameters = {    # Choose hyperparameters here
     'seed': seed,
-    'environment': Environment(variant, data_dir),
+    'environment': make_environment(observation, variant, data_dir),
     'variant': variant,
-    'input_shape': (5, 5, 5),
+    'input_shape': calculate_input_shape(observation),
+    'early_stopping': 10,
     'lr_actor': 0.0005,
     'lr_critic_1': 0.0005,
     'lr_critic_2': 0.0005,
@@ -48,4 +48,4 @@ algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_impro
 
 
 # Train algorithm
-algorithm.train_ppo()
+algorithm.train()

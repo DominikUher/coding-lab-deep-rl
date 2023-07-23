@@ -6,13 +6,14 @@ import random
 
 
 class PPO:
-    def __init__(self, seed, env, variant, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
+    def __init__(self, seed, env, variant, input_shape, early_stopping, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
                  no_of_actors, actor_updates_per_episode, critic_updates_per_episode, clip_annealing_factor):
-        self.agent = PPOAgent(variant, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors)
+        self.agent = PPOAgent(variant, input_shape, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors)
         self.env = env
         self.actor_updates_per_episode = actor_updates_per_episode
         self.critic_updates_per_episode = critic_updates_per_episode
         self.clip_annealing_factor = clip_annealing_factor
+        self.early_stopping = early_stopping
         os.environ['PYTHONHASHSEED'] = str(seed)
         tf.random.set_seed(seed)
         np.random.seed(seed)
@@ -20,16 +21,18 @@ class PPO:
 
     @classmethod
     def from_dict(cls, d):
-        ppo = cls(d['seed'], d['environment'], d['variant'], d['lr_actor'], d['lr_critic_1'], d['lr_critic_2'],
-                  d['return_lambda'], d['gamma'], d['clip_epsilon'], d['episode_steps'], d['no_of_actors'],
+        ppo = cls(d['seed'], d['environment'], d['variant'], d['input_shape'], d['early_stopping'], d['lr_actor'], d['lr_critic_1'],
+                  d['lr_critic_2'], d['return_lambda'], d['gamma'], d['clip_epsilon'], d['episode_steps'], d['no_of_actors'],
                   d['actor_updates_per_episode'], d['critic_updates_per_episode'], d['clip_annealing_factor'])
         return ppo
 
-    def train_ppo(self):
+    def train(self):
         self.run_ppo(mode='training')
 
     def run_ppo(self, mode='validation'):
         training = mode == 'training'
+        episodes_without_improvement = 0
+        best_score = -np.inf
 
         if training:
             no_of_episodes = 800
@@ -39,6 +42,8 @@ class PPO:
         reward_history = deque(maxlen=no_of_episodes)
 
         for episode in range(no_of_episodes):
+            if episodes_without_improvement >= self.early_stopping:
+                break
             self.agent.clip_epsilon *= self.clip_annealing_factor   # adaptive clip epsilon
 
             episode_reward_history = np.zeros(shape=self.agent.no_of_actors, dtype=np.float32)
@@ -109,11 +114,18 @@ class PPO:
 
             reward_history.append(episode_reward_history)
 
+            if mean_reward > best_score:
+                best_score = mean_reward
+                episodes_without_improvement = 0
+            else:
+                episodes_without_improvement += 1
+
 
 class PPOAgent:
-    def __init__(self, variant, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
+    def __init__(self, variant, input_shape, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
                  no_of_actors):
-        self.no_of_features = [13, 19, 0][variant]  # depends on the number of features
+        #self.no_of_features = [13, 19, 0][variant]  # depends on the number of features
+        self.no_of_features = input_shape
         self.no_of_actions = 5
 
         # some hyperparameters
