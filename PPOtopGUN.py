@@ -10,6 +10,11 @@ class PPO:
                  no_of_actors, actor_updates_per_episode, critic_updates_per_episode, clip_annealing_factor):
         self.agent = PPOAgent(variant, input_shape, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors)
         self.env = env
+        self.variant = variant
+        self.lr = lr_actor
+        self.lbd = return_lambda
+        self.gamma = gamma
+        self.epsilon = clip_epsilon
         self.actor_updates_per_episode = actor_updates_per_episode
         self.critic_updates_per_episode = critic_updates_per_episode
         self.clip_annealing_factor = clip_annealing_factor
@@ -33,6 +38,7 @@ class PPO:
         training = mode == 'training'
         episodes_without_improvement = 0
         best_score = -np.inf
+        best_episode = 0
 
         if training:
             no_of_episodes = 800
@@ -116,9 +122,14 @@ class PPO:
 
             if mean_reward > best_score:
                 best_score = mean_reward
+                best_episode = episode
                 episodes_without_improvement = 0
             else:
                 episodes_without_improvement += 1
+        f = open(f'./output/PPO_v{self.variant}_lr{self.lr}_lambda{self.lbd}_gamma{self.gamma}_epsilon{self.epsilon}.txt', 'w')
+        f.write (f'Best score of {best_score} achieved in episode {best_episode}')
+        f.close()
+        
 
 
 class PPOAgent:
@@ -212,8 +223,11 @@ class PPOAgent:
     @tf.function
     def choose_action(self, state):
         action_dist = self.actor(state)
+        print(f'Action dist: {action_dist}')
+        print(f'Action dist[0]: {action_dist[0]}')
         action = tf.random.categorical(tf.math.log(action_dist), 1)
         action = tf.squeeze(action)
+        print(f'Action: {action}')
         action_prob = action_dist[0][action]
         return action_prob, action
 

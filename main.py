@@ -43,9 +43,22 @@ algorithm_parameters = {    # Choose hyperparameters here
 }
 
 
-# Initializing algorithm and environment
-algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
+
+for e in [0.05, 0.1, 0.25]:
+    for g in [0.9, 0.95, 0.99]:
+        for l in [0.25, 0.5, 0.75]:
+            for lr in [0.005, 0.01, 0.05]:
+                algorithm_parameters['clip_epsilon'] = e
+                algorithm_parameters['gamma'] = g
+                algorithm_parameters['return_lambda'] = l
+                algorithm_parameters['lr_actor'] = lr
+                algorithm_parameters['lr_critic_1'] = lr
+                algorithm_parameters['lr_critic_2'] = lr
+
+                # Initializing algorithm and environment
+                algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
 
 
-# Train algorithm
-algorithm.train()
+                # Train algorithm
+                algorithm.train()
+

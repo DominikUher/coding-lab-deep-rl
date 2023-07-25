@@ -1,0 +1,1 @@
+Best score of 113.3499984741211 achieved in episode 51

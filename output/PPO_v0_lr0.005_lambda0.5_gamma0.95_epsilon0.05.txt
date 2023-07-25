@@ -1,0 +1,1 @@
+Best score of 132.4166717529297 achieved in episode 63
