@@ -4,9 +4,10 @@ from environment_dist_possible import Environment as Greedy
 from environment_CNN import Environment as Neutral
 
 def make_algorithm(algorithm_name, hyperparameters, improvements):
+    params_without_env = {k: hyperparameters[k] for k in set(list(hyperparameters.keys())) - {'environment'}}
     match algorithm_name:
         case 'PPO':
-            print(f'Starting training for {algorithm_name} with params {hyperparameters}')
+            print(f'Starting training for {algorithm_name} with params {params_without_env}')
             return PPO.from_dict(hyperparameters)
         case 'CNN_PPO':
             return CNN_PPO.from_dict(hyperparameters)
