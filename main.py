@@ -43,11 +43,10 @@ algorithm_parameters = {    # Choose hyperparameters here
 }
 
 
-
 for e in [0.05, 0.1, 0.25]:
     for g in [0.9, 0.95, 0.99]:
         for l in [0.25, 0.5, 0.75]:
-            for lr in [0.005, 0.01, 0.05]:
+            for lr in [0.00001, 0.0001, 0.001]:
                 algorithm_parameters['clip_epsilon'] = e
                 algorithm_parameters['gamma'] = g
                 algorithm_parameters['return_lambda'] = l
