@@ -6,6 +6,7 @@ from environment_CNN import Environment as Neutral
 def make_algorithm(algorithm_name, hyperparameters, improvements):
     match algorithm_name:
         case 'PPO':
+            print(f'Starting training for {algorithm_name} with params {hyperparameters}')
             return PPO.from_dict(hyperparameters)
         case 'CNN_PPO':
             return CNN_PPO.from_dict(hyperparameters)
@@ -17,6 +18,7 @@ def make_environment(environment_name, variant, data_dir):
         case 'Greedy':
             return Greedy(variant, data_dir)
         case 'Neutral':
+            print(f'Chosen observation type: {environment_name}')
             return Neutral(variant, data_dir)
         case _:
             return Neutral(variant, data_dir)
