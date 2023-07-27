@@ -7,8 +7,9 @@ import random
 
 class PPO:
     def __init__(self, seed, env, variant, input_shape, hidden_size, early_stopping, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
-                 no_of_actors, actor_updates_per_episode, critic_updates_per_episode, clip_annealing_factor):
+                 no_of_actors, actor_updates_per_episode, critic_updates_per_episode, clip_annealing_factor, hyperparameters):
         self.agent = PPOAgent(variant, input_shape, hidden_size, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors)
+        self.hyperparameters = hyperparameters
         self.env = env
         self.variant = variant
         self.lr = lr_actor
@@ -28,7 +29,7 @@ class PPO:
     def from_dict(cls, d):
         ppo = cls(d['seed'], d['environment'], d['variant'], d['input_shape'], d['hidden_size'], d['early_stopping'], d['lr_actor'], d['lr_critic_1'],
                   d['lr_critic_2'], d['return_lambda'], d['gamma'], d['clip_epsilon'], d['episode_steps'], d['no_of_actors'],
-                  d['actor_updates_per_episode'], d['critic_updates_per_episode'], d['clip_annealing_factor'])
+                  d['actor_updates_per_episode'], d['critic_updates_per_episode'], d['clip_annealing_factor'], d)
         return ppo
 
     def train(self):
@@ -48,7 +49,7 @@ class PPO:
         reward_history = deque(maxlen=no_of_episodes)
 
         for episode in range(no_of_episodes):
-            if episodes_without_improvement >= self.early_stopping:
+            if (episodes_without_improvement >= self.early_stopping) and training:
                 break
             self.agent.clip_epsilon *= self.clip_annealing_factor   # adaptive clip epsilon
 
@@ -68,6 +69,7 @@ class PPO:
                 action_probs_buffer = np.zeros(
                     shape=(self.agent.no_of_actors, self.agent.episode_steps, 1), dtype=np.float32)
                 value_buffer = np.zeros(shape=(self.agent.no_of_actors, self.agent.episode_steps, 1), dtype=np.float32)
+                episode_history = []
                 action_history = []
 
             for n in range(self.agent.no_of_actors):
@@ -76,10 +78,10 @@ class PPO:
                 state = tf.reshape(state, shape=(1, self.agent.no_of_features))
 
                 for t in range(self.agent.episode_steps):
-
                     action_prob, action = self.agent.choose_action(state)
-                    action_history.append(action)
                     action_counter[action] += 1
+                    if n == self.agent.no_of_actors-1:
+                        action_history.append(action.numpy())
                     reward, next_state, done = self.env.step(action)
                     next_state = tf.reshape(next_state, shape=(1, self.agent.no_of_features))
 
@@ -100,6 +102,9 @@ class PPO:
                         episode_reward_history[n] = episode_reward
                         break
 
+                if n == self.agent.no_of_actors-1:
+                    episode_history.append(self.env.episode)
+                    
             if training:
 
                 return_buffer, advantage_buffer = self.agent.calculate_actor_update_prerequisites(self.agent.no_of_actors, reward_buffer, value_buffer)
@@ -132,8 +137,10 @@ class PPO:
             else:
                 episodes_without_improvement += 1
         f = open(f'./output/PPO_v{self.variant}_s{best_score_str}_lr{self.lr}_lb{self.lbd}_g{self.gamma}_e{self.epsilon}.txt', 'w')
-        f.write (f'Best score of {best_score_str} achieved in episode {best_episode}')
-        f.write(f'Actions taken during episode {best_episode}:\n{best_episode_actions}')
+        f.write(f'Best score of {best_score_str} achieved in episode {best_episode}\n')
+        f.write(f'Chosen hyperparameters: {self.hyperparameters}\n\n')
+        f.writelines(f'Episode history for last actor: {episode_history}\n\n')
+        f.writelines(f'Actions taken by last actor: {best_episode_actions}')
         f.close()
         
 
