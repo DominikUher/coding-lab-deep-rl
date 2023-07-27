@@ -29,7 +29,7 @@ algorithm_parameters = {    # Choose hyperparameters here
     'variant': variant,
     'input_shape': calculate_input_shape(observation),
     'hidden_size': 256,
-    'early_stopping': 1,
+    'early_stopping': 20,
     'lr_actor': 0.001,
     'lr_critic_1': 0.001,
     'lr_critic_2': 0.001,
@@ -42,17 +42,18 @@ algorithm_parameters = {    # Choose hyperparameters here
     'critic_updates_per_episode': 200,
     'clip_annealing_factor': 0.99
 }
+for n in [256, 512, 1024]:
+    for lr in [0.0001, 0.001, 0.01]:
+        algorithm_parameters['hidden_size'] = n
+        algorithm_parameters['lr_actor'] = lr
+        algorithm_parameters['lr_critic_1'] = lr
+        algorithm_parameters['lr_critic_2'] = lr
 
-for lr in [0.0005, 0.001, 0.005]:
-    algorithm_parameters['lr_actor'] = lr
-    algorithm_parameters['lr_critic_1'] = lr
-    algorithm_parameters['lr_critic_2'] = lr
+        # Initializing algorithm and environment
+        algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
 
-    # Initializing algorithm and environment
-    algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
-
-    # Train algorithm
-    algorithm.train()
+        # Train algorithm
+        algorithm.train()
 
 '''
 for e in [0.05, 0.1, 0.25]:

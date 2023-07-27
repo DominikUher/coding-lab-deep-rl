@@ -69,9 +69,9 @@ class PPO:
                 action_probs_buffer = np.zeros(
                     shape=(self.agent.no_of_actors, self.agent.episode_steps, 1), dtype=np.float32)
                 value_buffer = np.zeros(shape=(self.agent.no_of_actors, self.agent.episode_steps, 1), dtype=np.float32)
+            else:
                 episode_history = []
                 action_history = []
-
             for n in range(self.agent.no_of_actors):
                 episode_reward = 0
                 state = self.env.reset(mode)
