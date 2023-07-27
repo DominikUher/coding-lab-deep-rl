@@ -23,6 +23,7 @@ algorithm_improvements = {  # Choose which improvements to use
     'boltzmann_exploration': False,
     'noisy_nets': False
 }
+
 algorithm_parameters = {    # Choose hyperparameters here
     'seed': seed,
     'environment': make_environment(observation, variant, data_dir),
@@ -42,18 +43,17 @@ algorithm_parameters = {    # Choose hyperparameters here
     'critic_updates_per_episode': 200,
     'clip_annealing_factor': 0.99
 }
-for n in [256, 512, 1024]:
-    for lr in [0.0001, 0.001, 0.01]:
-        algorithm_parameters['hidden_size'] = n
-        algorithm_parameters['lr_actor'] = lr
-        algorithm_parameters['lr_critic_1'] = lr
-        algorithm_parameters['lr_critic_2'] = lr
 
-        # Initializing algorithm and environment
-        algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
+algorithm_parameters['hidden_size'] = 1024
+algorithm_parameters['lr_actor'] = 0.001
+algorithm_parameters['lr_critic_1'] = 0.001
+algorithm_parameters['lr_critic_2'] = 0.001
 
-        # Train algorithm
-        algorithm.train()
+# Initializing algorithm and environment
+algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
+
+# Train algorithm
+algorithm.train()
 
 '''
 for e in [0.05, 0.1, 0.25]:

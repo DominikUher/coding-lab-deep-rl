@@ -1,0 +1,6 @@
+Best score of 5.72 achieved in episode 11
+Chosen hyperparameters: {'seed': 10, 'environment': <environment_CNN_moving.Environment object at 0x00000274F18BFFD0>, 'variant': 0, 'input_shape': 125, 'hidden_size': 256, 'early_stopping': 20, 'lr_actor': 0.001, 'lr_critic_1': 0.001, 'lr_critic_2': 0.001, 'return_lambda': 0.75, 'gamma': 0.9, 'clip_epsilon': 0.05, 'episode_steps': 200, 'no_of_actors': 30, 'actor_updates_per_episode': 200, 'critic_updates_per_episode': 200, 'clip_annealing_factor': 0.99}
+
+Episode history for last actor: [891]
+
+Actions taken by last actor: [1, 0, 2, 0, 1, 1, 1, 1, 1, 2, 1, 1, 1, 0, 2, 0, 4, 0, 2, 1, 2, 0, 2, 2, 0, 1, 1, 0, 0, 1, 1, 1, 2, 0, 0, 1, 2, 0, 1, 0, 2, 0, 2, 0, 1, 0, 0, 2, 1, 1, 0, 2, 0, 0, 2, 2, 0, 2, 0, 1, 2, 2, 0, 0, 0, 1, 1, 1, 0, 2, 1, 0, 2, 2, 1, 0, 1, 1, 0, 1, 1, 1, 2, 2, 2, 1, 0, 1, 2, 1, 1, 2, 1, 1, 2, 1, 0, 0, 1, 1, 0, 0, 2, 2, 1, 2, 1, 0, 2, 1, 2, 0, 2, 0, 0, 2, 1, 1, 2, 1, 2, 2, 1, 0, 0, 0, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 2, 2, 0, 0, 1, 0, 0, 0, 1, 1, 2, 0, 1, 1, 2, 0, 1, 2, 1, 2, 2, 0, 2, 0, 0, 0, 2, 2, 2, 1, 1, 2, 0, 1, 2, 2, 2, 0, 1, 0, 2, 0, 1, 2, 0, 2, 2, 1, 0, 1, 0, 0, 1, 2, 0, 1, 0, 1, 2, 0]
