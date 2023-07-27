@@ -6,9 +6,9 @@ import random
 
 
 class PPO:
-    def __init__(self, seed, env, variant, input_shape, early_stopping, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
+    def __init__(self, seed, env, variant, input_shape, hidden_size, early_stopping, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
                  no_of_actors, actor_updates_per_episode, critic_updates_per_episode, clip_annealing_factor):
-        self.agent = PPOAgent(variant, input_shape, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors)
+        self.agent = PPOAgent(variant, input_shape, hidden_size, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors)
         self.env = env
         self.variant = variant
         self.lr = lr_actor
@@ -26,7 +26,7 @@ class PPO:
 
     @classmethod
     def from_dict(cls, d):
-        ppo = cls(d['seed'], d['environment'], d['variant'], d['input_shape'], d['early_stopping'], d['lr_actor'], d['lr_critic_1'],
+        ppo = cls(d['seed'], d['environment'], d['variant'], d['input_shape'], d['hidden_size'], d['early_stopping'], d['lr_actor'], d['lr_critic_1'],
                   d['lr_critic_2'], d['return_lambda'], d['gamma'], d['clip_epsilon'], d['episode_steps'], d['no_of_actors'],
                   d['actor_updates_per_episode'], d['critic_updates_per_episode'], d['clip_annealing_factor'])
         return ppo
@@ -68,6 +68,7 @@ class PPO:
                 action_probs_buffer = np.zeros(
                     shape=(self.agent.no_of_actors, self.agent.episode_steps, 1), dtype=np.float32)
                 value_buffer = np.zeros(shape=(self.agent.no_of_actors, self.agent.episode_steps, 1), dtype=np.float32)
+                action_history = []
 
             for n in range(self.agent.no_of_actors):
                 episode_reward = 0
@@ -77,6 +78,7 @@ class PPO:
                 for t in range(self.agent.episode_steps):
 
                     action_prob, action = self.agent.choose_action(state)
+                    action_history.append(action)
                     action_counter[action] += 1
                     reward, next_state, done = self.env.step(action)
                     next_state = tf.reshape(next_state, shape=(1, self.agent.no_of_features))
@@ -113,31 +115,36 @@ class PPO:
             mean_actor_loss = np.mean(actor_loss)
             mean_reward = np.mean(episode_reward_history)
             actions_count = [np.round(frequency / self.agent.no_of_actors, 2) for frequency in action_counter]
+            mean_reward_str = '%.2f' % mean_reward
 
             print(
-                f'episode: {episode} | episode reward: {np.round(mean_reward, 2)} '
+                f'episode: {episode} | episode reward: {mean_reward_str} '
                 f'| actor loss: {np.round(mean_actor_loss, 4)}  actions: {actions_count}')
 
             reward_history.append(episode_reward_history)
 
             if mean_reward > best_score:
                 best_score = mean_reward
+                best_score_str = '%.2f' % best_score
                 best_episode = episode
+                best_episode_actions = action_history
                 episodes_without_improvement = 0
             else:
                 episodes_without_improvement += 1
-        f = open(f'./output/PPO_v{self.variant}_lr{self.lr}_lambda{self.lbd}_gamma{self.gamma}_epsilon{self.epsilon}.txt', 'w')
-        f.write (f'Best score of {best_score} achieved in episode {best_episode}')
+        f = open(f'./output/PPO_s{best_score_str}_v{self.variant}_lr{self.lr}_lb{self.lbd}_g{self.gamma}_e{self.epsilon}.txt', 'w')
+        f.write (f'Best score of {best_score_str} achieved in episode {best_episode}')
+        f.write(f'Actions taken during episode {best_episode}:\n{best_episode_actions}')
         f.close()
         
 
 
 class PPOAgent:
-    def __init__(self, variant, input_shape, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
+    def __init__(self, variant, input_shape, hidden_size, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
                  no_of_actors):
         #self.no_of_features = [13, 19, 0][variant]  # depends on the number of features
         self.no_of_features = input_shape
         self.no_of_actions = 5
+        self.hidden_size = hidden_size
 
         # some hyperparameters
         self.no_of_actors = no_of_actors
@@ -163,8 +170,8 @@ class PPOAgent:
 
     def create_nn(self, nn_type):
         input_layer = tf.keras.Input(shape=(self.no_of_features,), dtype=tf.float32)
-        dense1 = tf.keras.layers.Dense(units=128, activation='tanh')(input_layer)
-        dense2 = tf.keras.layers.Dense(units=128, activation='tanh')(dense1)
+        dense1 = tf.keras.layers.Dense(units=self.hidden_size, activation='tanh')(input_layer)
+        dense2 = tf.keras.layers.Dense(units=self.hidden_size, activation='tanh')(dense1)
         if nn_type == 'actor':
             output = tf.keras.layers.Dense(self.no_of_actions, activation='softmax')(dense2)
         if nn_type == 'critic':
@@ -223,11 +230,8 @@ class PPOAgent:
     @tf.function
     def choose_action(self, state):
         action_dist = self.actor(state)
-        print(f'Action dist: {action_dist}')
-        print(f'Action dist[0]: {action_dist[0]}')
         action = tf.random.categorical(tf.math.log(action_dist), 1)
         action = tf.squeeze(action)
-        print(f'Action: {action}')
         action_prob = action_dist[0][action]
         return action_prob, action
 

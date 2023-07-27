@@ -28,13 +28,14 @@ algorithm_parameters = {    # Choose hyperparameters here
     'environment': make_environment(observation, variant, data_dir),
     'variant': variant,
     'input_shape': calculate_input_shape(observation),
+    'hidden_size': 256,
     'early_stopping': 10,
-    'lr_actor': 0.0005,
-    'lr_critic_1': 0.0005,
-    'lr_critic_2': 0.0005,
-    'return_lambda': 0.5,
-    'gamma': 0.95,
-    'clip_epsilon': 0.15,
+    'lr_actor': 0.001,
+    'lr_critic_1': 0.001,
+    'lr_critic_2': 0.001,
+    'return_lambda': 0.75,
+    'gamma': 0.9,
+    'clip_epsilon': 0.05,
     'episode_steps': 200,
     'no_of_actors': 30,
     'actor_updates_per_episode': 200,
@@ -42,7 +43,18 @@ algorithm_parameters = {    # Choose hyperparameters here
     'clip_annealing_factor': 0.99
 }
 
+for lr in [0.0005, 0.001, 0.005]:
+    algorithm_parameters['lr_actor'] = lr
+    algorithm_parameters['lr_critic_1'] = lr
+    algorithm_parameters['lr_critic_2'] = lr
 
+    # Initializing algorithm and environment
+    algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
+
+    # Train algorithm
+    algorithm.train()
+
+'''
 for e in [0.05, 0.1, 0.25]:
     for g in [0.9, 0.95, 0.99]:
         for l in [0.25, 0.5, 0.75]:
@@ -57,7 +69,6 @@ for e in [0.05, 0.1, 0.25]:
                 # Initializing algorithm and environment
                 algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
 
-
                 # Train algorithm
                 algorithm.train()
-
+'''
