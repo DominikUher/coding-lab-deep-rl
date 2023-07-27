@@ -1,7 +1,7 @@
 from PPOtopGUN import PPO
 from main_CNN import PPO as CNN_PPO
 from environment_dist_possible import Environment as Greedy
-from environment_CNN import Environment as Neutral
+from environment_CNN_moving import Environment as Neutral
 
 def make_algorithm(algorithm_name, hyperparameters, improvements):
     params_without_env = {k: hyperparameters[k] for k in set(list(hyperparameters.keys())) - {'environment'}}
