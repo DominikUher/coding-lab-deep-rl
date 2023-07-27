@@ -29,7 +29,7 @@ algorithm_parameters = {    # Choose hyperparameters here
     'environment': make_environment(observation, variant, data_dir),
     'variant': variant,
     'input_shape': calculate_input_shape(observation),
-    'hidden_size': 256,
+    'hidden_size': 128,
     'early_stopping': 20,
     'lr_actor': 0.001,
     'lr_critic_1': 0.001,
@@ -38,38 +38,24 @@ algorithm_parameters = {    # Choose hyperparameters here
     'gamma': 0.9,
     'clip_epsilon': 0.05,
     'episode_steps': 200,
-    'no_of_actors': 30,
+    'no_of_actors': 5,
     'actor_updates_per_episode': 200,
     'critic_updates_per_episode': 200,
     'clip_annealing_factor': 0.99
 }
 
-algorithm_parameters['hidden_size'] = 1024
-algorithm_parameters['lr_actor'] = 0.001
-algorithm_parameters['lr_critic_1'] = 0.001
-algorithm_parameters['lr_critic_2'] = 0.001
+for n in [128, 256]:
+    for obs in ['Neutral', 'ImageLike', 'Greedy']:
+        for lr in [0.00001, 0.0001, 0.001]:
+            algorithm_parameters['hidden_size'] = n
+            algorithm_parameters['environment'] = make_environment(obs, variant, data_dir)
+            algorithm_parameters['input_shape'] = calculate_input_shape(obs)
+            algorithm_parameters['lr_actor'] = lr
+            algorithm_parameters['lr_critic_1'] = lr
+            algorithm_parameters['lr_critic_2'] = lr
 
-# Initializing algorithm and environment
-algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
+            # Initializing algorithm and environment
+            algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
 
-# Train algorithm
-algorithm.train()
-
-'''
-for e in [0.05, 0.1, 0.25]:
-    for g in [0.9, 0.95, 0.99]:
-        for l in [0.25, 0.5, 0.75]:
-            for lr in [0.00001, 0.0001, 0.001]:
-                algorithm_parameters['clip_epsilon'] = e
-                algorithm_parameters['gamma'] = g
-                algorithm_parameters['return_lambda'] = l
-                algorithm_parameters['lr_actor'] = lr
-                algorithm_parameters['lr_critic_1'] = lr
-                algorithm_parameters['lr_critic_2'] = lr
-
-                # Initializing algorithm and environment
-                algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
-
-                # Train algorithm
-                algorithm.train()
-'''
+            # Train algorithm
+            algorithm.train()

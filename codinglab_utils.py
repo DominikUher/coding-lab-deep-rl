@@ -1,7 +1,8 @@
 from PPOtopGUN import PPO
 from main_CNN import PPO as CNN_PPO
 from environment_dist_possible import Environment as Greedy
-from environment_CNN_moving import Environment as Neutral
+from environment_CNN_moving import Environment as ImageLike
+from environment import Environment as Neutral
 
 def make_algorithm(algorithm_name, hyperparameters, improvements):
     params_without_env = {k: hyperparameters[k] for k in set(list(hyperparameters.keys())) - {'environment'}}
@@ -21,6 +22,8 @@ def make_environment(environment_name, variant, data_dir):
         case 'Neutral':
             print(f'Chosen observation type: {environment_name}')
             return Neutral(variant, data_dir)
+        case 'ImageLike':
+            return ImageLike(variant, data_dir)
         case _:
             return Neutral(variant, data_dir)
         
@@ -29,6 +32,8 @@ def calculate_input_shape(environment_name):
         case 'Greedy':
             return 13
         case 'Neutral':
+            return 20
+        case 'ImageLike':
             return 125
         case _:
             return 125

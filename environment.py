@@ -12,6 +12,7 @@ import random
 import pandas as pd
 from copy import deepcopy
 from itertools import compress
+import tensorflow as tf
 
 
 class Environment(object):
@@ -80,6 +81,7 @@ class Environment(object):
             self.remaining_training_episodes.remove(episode)
         self.data = pd.read_csv(self.data_dir + f'/variant_{self.variant}/episode_data/episode_{episode:03d}.csv',
                                 index_col=0)
+        self.episode = episode
 
         return self.get_obs()
 
@@ -146,6 +148,46 @@ class Environment(object):
     # TODO: implement function that gives the input features for the neural network(s)
     #       based on the current state of the environment
     def get_obs(self):
-        ...
+        agent_vertical_pos = self.agent_loc[0]
+        agent_horizontal_pos = self.agent_loc[1]
+        agent_remaining_capacity = self.agent_capacity - self.agent_load
+        target_vertical_pos = self.vertical_idx_target
+        target_horizontal_pos = self.horizontal_idx_target
+        item1_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 0 else 0
+        item1_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 0 else 0
+        item1_remaining_time = self.max_response_time - self.item_times[0] if len(self.item_locs) > 0 else 0
+        item2_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 1 else 0
+        item2_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 1 else 0
+        item2_remaining_time = self.max_response_time - self.item_times[1] if len(self.item_locs) > 1 else 0
+        item3_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 2 else 0
+        item3_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 2 else 0
+        item3_remaining_time = self.max_response_time - self.item_times[2] if len(self.item_locs) > 2 else 0
+        item4_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 3 else 0
+        item4_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 3 else 0
+        item4_remaining_time = self.max_response_time - self.item_times[3] if len(self.item_locs) > 3 else 0
+        item5_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 4 else 0
+        item5_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 4 else 0
+        item5_remaining_time = self.max_response_time - self.item_times[4] if len(self.item_locs) > 4 else 0
 
-        return ...
+
+        return tf.constant([agent_vertical_pos,
+                            agent_horizontal_pos,
+                            agent_remaining_capacity,
+                            target_vertical_pos,
+                            target_horizontal_pos,
+                            item1_vertical_pos,
+                            item1_horizontal_pos,
+                            item1_remaining_time,
+                            item2_vertical_pos,
+                            item2_horizontal_pos,
+                            item2_remaining_time,
+                            item3_vertical_pos,
+                            item3_horizontal_pos,
+                            item3_remaining_time,
+                            item4_vertical_pos,
+                            item4_horizontal_pos,
+                            item4_remaining_time,
+                            item5_vertical_pos,
+                            item5_horizontal_pos,
+                            item5_remaining_time],
+                            dtype=tf.int32)
