@@ -131,7 +131,7 @@ class PPO:
                 episodes_without_improvement = 0
             else:
                 episodes_without_improvement += 1
-        f = open(f'./output/PPO_s{best_score_str}_v{self.variant}_lr{self.lr}_lb{self.lbd}_g{self.gamma}_e{self.epsilon}.txt', 'w')
+        f = open(f'./output/PPO_v{self.variant}_s{best_score_str}_lr{self.lr}_lb{self.lbd}_g{self.gamma}_e{self.epsilon}.txt', 'w')
         f.write (f'Best score of {best_score_str} achieved in episode {best_episode}')
         f.write(f'Actions taken during episode {best_episode}:\n{best_episode_actions}')
         f.close()
