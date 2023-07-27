@@ -29,7 +29,7 @@ algorithm_parameters = {    # Choose hyperparameters here
     'variant': variant,
     'input_shape': calculate_input_shape(observation),
     'hidden_size': 256,
-    'early_stopping': 10,
+    'early_stopping': 1,
     'lr_actor': 0.001,
     'lr_critic_1': 0.001,
     'lr_critic_2': 0.001,
