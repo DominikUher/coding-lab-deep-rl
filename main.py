@@ -47,19 +47,21 @@ algorithm_parameters = {    # Choose hyperparameters here
 
 for n in [128, 256]:
     for obs in ['Neutral', 'ImageLike', 'Greedy']:
-        for l in [0.25, 0.5, 0.75]:
-            for lr in [0.00001, 0.0001, 0.001]:
-                algorithm_parameters['observation'] = obs
-                algorithm_parameters['environment'] = make_environment(obs, variant, data_dir)
-                algorithm_parameters['hidden_size'] = n
-                algorithm_parameters['input_shape'] = calculate_input_shape(obs)
-                algorithm_parameters['return_lambda'] = l
-                algorithm_parameters['lr_actor'] = lr
-                algorithm_parameters['lr_critic_1'] = lr
-                algorithm_parameters['lr_critic_2'] = lr
+        for g in [0.9, 0.95, 0.99]:
+            for l in [0.25, 0.5, 0.75]:
+                for lr in [0.00001, 0.0001, 0.001]:
+                    algorithm_parameters['observation'] = obs
+                    algorithm_parameters['environment'] = make_environment(obs, variant, data_dir)
+                    algorithm_parameters['hidden_size'] = n
+                    algorithm_parameters['input_shape'] = calculate_input_shape(obs)
+                    algorithm_parameters['gamma'] = g
+                    algorithm_parameters['return_lambda'] = l
+                    algorithm_parameters['lr_actor'] = lr
+                    algorithm_parameters['lr_critic_1'] = lr
+                    algorithm_parameters['lr_critic_2'] = lr
 
-                # Initializing algorithm and environment
-                algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
+                    # Initializing algorithm and environment
+                    algorithm = make_algorithm(algorithm_name, algorithm_parameters, algorithm_improvements)
 
-                # Train algorithm
-                algorithm.train()
+                    # Train algorithm
+                    algorithm.train()
