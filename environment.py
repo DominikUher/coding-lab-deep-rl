@@ -10,6 +10,7 @@
 
 import random
 import pandas as pd
+import numpy as np
 from copy import deepcopy
 from itertools import compress
 import tensorflow as tf
@@ -148,46 +149,81 @@ class Environment(object):
     # TODO: implement function that gives the input features for the neural network(s)
     #       based on the current state of the environment
     def get_obs(self):
-        agent_vertical_pos = self.agent_loc[0]
-        agent_horizontal_pos = self.agent_loc[1]
-        agent_remaining_capacity = self.agent_capacity - self.agent_load
-        target_vertical_pos = self.vertical_idx_target
-        target_horizontal_pos = self.horizontal_idx_target
-        item1_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 0 else 0
-        item1_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 0 else 0
-        item1_remaining_time = self.max_response_time - self.item_times[0] if len(self.item_locs) > 0 else 0
-        item2_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 1 else 0
-        item2_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 1 else 0
-        item2_remaining_time = self.max_response_time - self.item_times[1] if len(self.item_locs) > 1 else 0
-        item3_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 2 else 0
-        item3_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 2 else 0
-        item3_remaining_time = self.max_response_time - self.item_times[2] if len(self.item_locs) > 2 else 0
-        item4_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 3 else 0
-        item4_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 3 else 0
-        item4_remaining_time = self.max_response_time - self.item_times[3] if len(self.item_locs) > 3 else 0
-        item5_vertical_pos = self.item_locs[0][0] if len(self.item_locs) > 4 else 0
-        item5_horizontal_pos = self.item_locs[0][1] if len(self.item_locs) > 4 else 0
-        item5_remaining_time = self.max_response_time - self.item_times[4] if len(self.item_locs) > 4 else 0
+        
+        # Agent distances to grid walls
+        dist_up = self.agent_loc[0]
+        dist_down = 4 - self.agent_loc[0]
+        dist_left = self.agent_loc[1]
+        dist_right = 4 - self.agent_loc[1]
 
+        # Agent distances to target
+        dist_y_target = self.target_loc[0] - self.agent_loc[0]
+        dist_x_target = self.target_loc[1] - self.agent_loc[1]
+        if dist_y_target > 0:
+            dist_up_target = -1
+            dist_down_target = np.abs(dist_y_target)
+        elif dist_y_target < 0:
+            dist_up_target = np.abs(dist_y_target)
+            dist_down_target = -1
+        else:
+            dist_up_target = dist_down_target = 0
+        if dist_x_target > 0:
+            dist_left_target = -1
+            dist_right_target = np.abs(dist_x_target)
+        elif dist_x_target < 0:
+            dist_left_target = np.abs(dist_x_target)
+            dist_right_target = -1
+        else:
+            dist_left_target = dist_right_target = 0
 
-        return tf.constant([agent_vertical_pos,
-                            agent_horizontal_pos,
-                            agent_remaining_capacity,
-                            target_vertical_pos,
-                            target_horizontal_pos,
-                            item1_vertical_pos,
-                            item1_horizontal_pos,
-                            item1_remaining_time,
-                            item2_vertical_pos,
-                            item2_horizontal_pos,
-                            item2_remaining_time,
-                            item3_vertical_pos,
-                            item3_horizontal_pos,
-                            item3_remaining_time,
-                            item4_vertical_pos,
-                            item4_horizontal_pos,
-                            item4_remaining_time,
-                            item5_vertical_pos,
-                            item5_horizontal_pos,
-                            item5_remaining_time],
-                            dtype=tf.int32)
+        next_item_flag = False # is there an item with positive net reward?
+        if len(self.item_times) > 0:
+
+            # create a list (eligible) with all items that can be reached before they disappear
+            items_time_left = [self.max_response_time - time for time in self.item_times]
+            eligible = []
+            for i in range(len(self.item_times)):
+                if items_time_left[i] - (np.abs(self.item_locs[i][0] - self.agent_loc[0]) +
+                                         np.abs(self.item_locs[i][1] - self.agent_loc[1])) >= 0:
+                    eligible.append(self.item_locs[i])
+
+            # calculate the net reward of all those reachable items
+            net_reward = [(self.reward - (np.abs(item[0] - self.agent_loc[0]) + np.abs(item[1] - self.agent_loc[1]) +
+                                          np.abs(item[0] - self.target_loc[0]) + np.abs(item[1] - self.target_loc[1])))
+                          for item in eligible]
+
+            # pick the one with the highest net reward
+            if len(eligible) > 0 and np.max(net_reward) > 0:
+                next_item = eligible[np.argmax(net_reward)]
+                dist_y_next_item = next_item[0] - self.agent_loc[0]
+                dist_x_next_item = next_item[1] - self.agent_loc[1]
+                next_item_flag = True
+
+        # if there is no item with positive net reward set all four distance metrics to -1
+        dist_right_next = dist_left_next = dist_up_next = dist_down_next = -1
+
+        # if there is:
+        if next_item_flag:
+            if dist_y_next_item > 0:
+                dist_up_next = -1
+                dist_down_next = np.abs(dist_y_next_item)
+            elif dist_y_next_item < 0:
+                dist_up_next = np.abs(dist_y_next_item)
+                dist_down_next = -1
+            else:
+                dist_up_next = dist_down_next = 0
+
+            if dist_x_next_item > 0:
+                dist_right_next = np.abs(dist_x_next_item)
+                dist_left_next = -1
+            elif dist_x_next_item < 0:
+                dist_right_next = -1
+                dist_left_next = np.abs(dist_x_next_item)
+            else:
+                dist_right_next = dist_left_next = 0
+
+        # return agent-wall, agent-target, agent-next_item distances plus the remaining agent capacity as state
+        return tf.constant([dist_up, dist_down, dist_left, dist_right,
+                            dist_up_target, dist_down_target, dist_left_target, dist_right_target,
+                            dist_up_next, dist_down_next, dist_left_next, dist_right_next,
+                            self.agent_capacity - self.agent_load], dtype=tf.float32)
