@@ -1,0 +1,6 @@
+Best score of 6.10 achieved in episode 32
+Chosen hyperparameters: {'seed': 10, 'observation': 'Neutral', 'environment': <environment.Environment object at 0x00000241A7DE04C0>, 'variant': 0, 'input_shape': 20, 'hidden_size': 128, 'early_stopping': 20, 'lr_actor': 0.001, 'lr_critic_1': 0.001, 'lr_critic_2': 0.001, 'return_lambda': 0.25, 'gamma': 0.99, 'clip_epsilon': 0.05, 'episode_steps': 200, 'no_of_actors': 5, 'actor_updates_per_episode': 200, 'critic_updates_per_episode': 200, 'clip_annealing_factor': 0.99}
+
+Episode history for last actor: [471]
+
+Actions taken by last actor: [0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 3, 3, 0, 0, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 4, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 0, 0, 3, 0, 0, 4, 4, 3, 3, 3, 4, 3, 3, 0, 3, 3, 3, 3, 3, 0, 3, 4, 0, 3, 3, 3, 3, 3, 0, 4, 4, 4, 3, 4, 3, 3, 3, 3, 4, 3, 0, 4, 4, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3]

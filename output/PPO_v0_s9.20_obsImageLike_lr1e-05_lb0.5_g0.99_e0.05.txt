@@ -1,0 +1,6 @@
+Best score of 9.20 achieved in episode 65
+Chosen hyperparameters: {'seed': 10, 'observation': 'ImageLike', 'environment': <environment_CNN_moving.Environment object at 0x00000241A359F370>, 'variant': 0, 'input_shape': 125, 'hidden_size': 128, 'early_stopping': 20, 'lr_actor': 1e-05, 'lr_critic_1': 1e-05, 'lr_critic_2': 1e-05, 'return_lambda': 0.5, 'gamma': 0.99, 'clip_epsilon': 0.05, 'episode_steps': 200, 'no_of_actors': 5, 'actor_updates_per_episode': 200, 'critic_updates_per_episode': 200, 'clip_annealing_factor': 0.99}
+
+Episode history for last actor: [629]
+
+Actions taken by last actor: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]

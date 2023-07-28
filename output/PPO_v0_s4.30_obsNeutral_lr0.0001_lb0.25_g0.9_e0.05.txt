@@ -1,0 +1,6 @@
+Best score of 4.30 achieved in episode 19
+Chosen hyperparameters: {'seed': 10, 'observation': 'Neutral', 'environment': <environment.Environment object at 0x00000241ECCBFFD0>, 'variant': 0, 'input_shape': 20, 'hidden_size': 128, 'early_stopping': 20, 'lr_actor': 0.0001, 'lr_critic_1': 0.0001, 'lr_critic_2': 0.0001, 'return_lambda': 0.25, 'gamma': 0.9, 'clip_epsilon': 0.05, 'episode_steps': 200, 'no_of_actors': 5, 'actor_updates_per_episode': 200, 'critic_updates_per_episode': 200, 'clip_annealing_factor': 0.99}
+
+Episode history for last actor: [745]
+
+Actions taken by last actor: [4, 4, 4, 0, 0, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 3, 0, 0, 0, 4, 0, 3, 0, 0, 4, 0, 3, 0, 4, 0, 0, 0, 4, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 0, 0, 3, 3, 0, 4, 0, 0, 4, 3, 4, 0, 3, 0, 0, 3, 0, 0, 0, 3, 0, 4, 3, 3, 0, 3, 3, 0, 4, 0, 0, 3, 4, 0, 0, 0, 3, 4, 4, 0, 4, 0, 0, 0, 0, 0, 4, 0, 3, 0, 0, 0, 0, 0, 0, 0, 4, 4, 3, 4, 0, 4, 0, 0, 3, 0, 3, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 4, 0, 0, 0, 3, 3, 3, 0, 4, 4, 0, 4, 4, 0, 0, 3, 0, 3, 0]

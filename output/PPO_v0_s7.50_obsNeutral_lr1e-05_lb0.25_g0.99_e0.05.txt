@@ -1,0 +1,6 @@
+Best score of 7.50 achieved in episode 51
+Chosen hyperparameters: {'seed': 10, 'observation': 'Neutral', 'environment': <environment.Environment object at 0x00000241A9FFEA40>, 'variant': 0, 'input_shape': 20, 'hidden_size': 128, 'early_stopping': 20, 'lr_actor': 1e-05, 'lr_critic_1': 1e-05, 'lr_critic_2': 1e-05, 'return_lambda': 0.25, 'gamma': 0.99, 'clip_epsilon': 0.05, 'episode_steps': 200, 'no_of_actors': 5, 'actor_updates_per_episode': 200, 'critic_updates_per_episode': 200, 'clip_annealing_factor': 0.99}
+
+Episode history for last actor: [723]
+
+Actions taken by last actor: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 4, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
