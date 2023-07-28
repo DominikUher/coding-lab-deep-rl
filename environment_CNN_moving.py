@@ -29,6 +29,7 @@ class Environment(object):
         self.max_response_time = 15 if self.variant == 2 else 10
         self.reward = 25 if self.variant == 2 else 15
         self.data_dir = data_dir
+        self.episode = -1
 
         # following 4 are added to remove episodic property
         self.agent_loc = (self.vertical_idx_target, self.horizontal_idx_target)
@@ -65,7 +66,7 @@ class Environment(object):
                                    (4,0), (4,1), (4,2),        (4,4)]
 
     # initialize a new episode (specify if training, validation, or testing via the mode argument)
-    def reset(self, mode):
+    def reset(self, mode, startAt=-1):
         modes = ['training', 'validation', 'testing']
         if mode not in modes:
             raise ValueError('Invalid mode. Expected one of: %s' % modes)
@@ -76,7 +77,9 @@ class Environment(object):
        # self.item_locs = []
        # self.item_times = []
 
-        if mode == "testing":
+        if startAt >= 0:
+            episode = startAt
+        elif mode == "testing":
             episode = self.test_episodes[0]
             self.test_episodes.remove(episode)
         elif mode == "validation":
