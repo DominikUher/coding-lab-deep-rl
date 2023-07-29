@@ -14,6 +14,7 @@ import numpy as np
 from copy import deepcopy
 from itertools import compress
 import tensorflow as tf
+from codinglab_utils import calculate_net_reward
 
 
 class Environment(object):
@@ -157,26 +158,13 @@ class Environment(object):
         dist_right = 4 - self.agent_loc[1]
 
         # Agent distances to target
-        dist_y_target = self.target_loc[0] - self.agent_loc[0]
-        dist_x_target = self.target_loc[1] - self.agent_loc[1]
-        if dist_y_target > 0:
-            dist_up_target = -1
-            dist_down_target = np.abs(dist_y_target)
-        elif dist_y_target < 0:
-            dist_up_target = np.abs(dist_y_target)
-            dist_down_target = -1
-        else:
-            dist_up_target = dist_down_target = 0
-        if dist_x_target > 0:
-            dist_left_target = -1
-            dist_right_target = np.abs(dist_x_target)
-        elif dist_x_target < 0:
-            dist_left_target = np.abs(dist_x_target)
-            dist_right_target = -1
-        else:
-            dist_left_target = dist_right_target = 0
+        dist_up_target = np.maximum(-1, self.agent_loc[0] - self.target_loc[0])
+        dist_down_target = np.maximum(-1, self.target_loc[0] - self.agent_loc[0])
+        dist_left_target = np.maximum(-1, self.agent_loc[1] - self.target_loc[1])
+        dist_right_target = np.maximum(-1, self.target_loc[1] - self.agent_loc[1])
 
-        next_item_flag = False # is there an item with positive net reward?
+        
+        item_distances = list(np.repeat(-1, 100))
         if len(self.item_times) > 0:
 
             # create a list (eligible) with all items that can be reached before they disappear
@@ -187,43 +175,26 @@ class Environment(object):
                                          np.abs(self.item_locs[i][1] - self.agent_loc[1])) >= 0:
                     eligible.append(self.item_locs[i])
 
-            # calculate the net reward of all those reachable items
-            net_reward = [(self.reward - (np.abs(item[0] - self.agent_loc[0]) + np.abs(item[1] - self.agent_loc[1]) +
-                                          np.abs(item[0] - self.target_loc[0]) + np.abs(item[1] - self.target_loc[1])))
-                          for item in eligible]
+            # calculate the net rewards of all those reachable items
+            net_rewards = [(calculate_net_reward(self.reward, item, self.agent_loc, self.target_loc)) for item in eligible]
 
-            # pick the one with the highest net reward
-            if len(eligible) > 0 and np.max(net_reward) > 0:
-                next_item = eligible[np.argmax(net_reward)]
-                dist_y_next_item = next_item[0] - self.agent_loc[0]
-                dist_x_next_item = next_item[1] - self.agent_loc[1]
-                next_item_flag = True
+            # sort eligible items by their net rewards
+            eligible_sorted = sorted(eligible, key=lambda x: calculate_net_reward(reward=self.reward, item_loc=x, agent_loc=self.agent_loc, target_loc=self.target_loc))
 
-        # if there is no item with positive net reward set all four distance metrics to -1
-        dist_right_next = dist_left_next = dist_up_next = dist_down_next = -1
+            # save agent-item directional distances of all items sorted by net reward
+            for n, item_loc in enumerate(eligible_sorted):
+                item_distances[4*n] = np.maximum(-1, self.agent_loc[0] - item_loc[0])
+                item_distances[4*n+1] = np.maximum(-1, item_loc[0] - self.agent_loc[0])
+                item_distances[4*n+2] = np.maximum(-1, self.agent_loc[1] - item_loc[1])
+                item_distances[4*n+3] = np.maximum(-1, item_loc[1] - self.agent_loc[1])
 
-        # if there is:
-        if next_item_flag:
-            if dist_y_next_item > 0:
-                dist_up_next = -1
-                dist_down_next = np.abs(dist_y_next_item)
-            elif dist_y_next_item < 0:
-                dist_up_next = np.abs(dist_y_next_item)
-                dist_down_next = -1
-            else:
-                dist_up_next = dist_down_next = 0
+        # select first five item distances
+        first_five = item_distances[:20]
 
-            if dist_x_next_item > 0:
-                dist_right_next = np.abs(dist_x_next_item)
-                dist_left_next = -1
-            elif dist_x_next_item < 0:
-                dist_right_next = -1
-                dist_left_next = np.abs(dist_x_next_item)
-            else:
-                dist_right_next = dist_left_next = 0
+        observation = [dist_up, dist_down, dist_left, dist_right,
+                        dist_up_target, dist_down_target, dist_left_target, dist_right_target]
+        observation.extend(first_five)
+        observation.extend([self.agent_capacity - self.agent_load])
 
         # return agent-wall, agent-target, agent-next_item distances plus the remaining agent capacity as state
-        return tf.constant([dist_up, dist_down, dist_left, dist_right,
-                            dist_up_target, dist_down_target, dist_left_target, dist_right_target,
-                            dist_up_next, dist_down_next, dist_left_next, dist_right_next,
-                            self.agent_capacity - self.agent_load], dtype=tf.float32)
+        return tf.constant(observation, dtype=tf.int8)

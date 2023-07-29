@@ -1,10 +1,9 @@
-from PPOtopGUN import PPO
-from main_CNN import PPO as CNN_PPO
-from environment_dist_possible import Environment as Greedy
-from environment_CNN_moving import Environment as ImageLike
-from environment import Environment as Neutral
+import numpy as np
 
 def make_algorithm(algorithm_name, hyperparameters, improvements):
+    from PPOtopGUN import PPO
+    from main_CNN import PPO as CNN_PPO
+
     params_without_env = {k: hyperparameters[k] for k in set(list(hyperparameters.keys())) - {'environment'}}
     match algorithm_name:
         case 'PPO':
@@ -15,25 +14,36 @@ def make_algorithm(algorithm_name, hyperparameters, improvements):
         case _:
             return PPO.from_dict(hyperparameters)
 
+
 def make_environment(environment_name, variant, data_dir):
+    from environment_dist_possible import Environment as Greedy
+    from environment_CNN_moving import Environment as ImageLike
+    from environment import Environment as Greedy5
+
     match environment_name:
         case 'Greedy':
             return Greedy(variant, data_dir)
         case 'Neutral':
             print(f'Chosen observation type: {environment_name}')
-            return Neutral(variant, data_dir)
+            return Greedy5(variant, data_dir)
         case 'ImageLike':
             return ImageLike(variant, data_dir)
         case _:
-            return Neutral(variant, data_dir)
+            return Greedy5(variant, data_dir)
         
+
 def calculate_input_shape(environment_name):
     match environment_name:
         case 'Greedy':
             return 13
-        case 'Neutral':
-            return 20
+        case 'Greedy5':
+            return 29
         case 'ImageLike':
             return 125
         case _:
             return 125
+
+
+def calculate_net_reward(reward, item_loc, agent_loc, target_loc):
+    net_reward = reward - (np.abs(item_loc[0] - agent_loc[0]) + np.abs(item_loc[1] - agent_loc[1]) + np.abs(item_loc[0] - target_loc[0]) + np.abs(item_loc[1] - target_loc[1]))
+    return net_reward
