@@ -30,7 +30,7 @@ algorithm_parameters = {    # Choose hyperparameters here
     'environment': make_environment(observation, variant, data_dir),
     'variant': variant,
     'input_shape': calculate_input_shape(observation),
-    'hidden_size': 128,
+    'hidden_size': 512,
     'early_stopping': 20,
     'validation_after_episodes': 5,
     'lr_actor': 0.001,
@@ -60,13 +60,13 @@ def line_search(paramater_name, values):
             best_parameters[paramater_name] = value
 
 line_search('hidden_size', [32, 64, 128, 256, 512])
-line_search('no_of_actors', [1, 10, 100, 1000])
-line_search('actor_updates_per_episode', [1, 10, 100, 1000])
-line_search('critic_updates_per_episode', [1, 10, 100, 1000])
+line_search('no_of_actors', [1, 10, 100])
+line_search('actor_updates_per_episode', [1, 10, 100])
+line_search('critic_updates_per_episode', [1, 10, 100])
 line_search('lr_actor', [0.00001, 0.0001, 0.001])
 line_search('lr_critic1', [0.00001, 0.0001, 0.001])
 line_search('lr_critic2', [0.00001, 0.0001, 0.001])
 line_search('return_lambda', [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875])
-line_search('gamma', [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 0.9, 0.95, 0.99])
+line_search('gamma', [0.75, 0.875, 0.9, 0.95, 0.99])
 line_search('clip_epsilon', [0.01, 0.05, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875])
 line_search('clip_annealing_factor', [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 0.9, 0.95, 0.99])
