@@ -18,26 +18,25 @@ def make_algorithm(algorithm_name, hyperparameters, improvements):
 def make_environment(environment_name, variant, data_dir):
     from environment_dist_possible import Environment as Greedy
     from environment_CNN_moving import Environment as ImageLike
-    from environment import Environment as Greedy5
+    from environment import Environment as GreedyN
 
     match environment_name:
+        case s if s.startswith('NGreedy'):
+            return GreedyN(variant, data_dir, s[-1:])
         case 'Greedy':
             return Greedy(variant, data_dir)
-        case 'Neutral':
-            print(f'Chosen observation type: {environment_name}')
-            return Greedy5(variant, data_dir)
         case 'ImageLike':
             return ImageLike(variant, data_dir)
         case _:
-            return Greedy5(variant, data_dir)
+            return ImageLike(variant, data_dir)
         
 
 def calculate_input_shape(environment_name):
     match environment_name:
+        case n if n.startswith('NGreedy'):
+            return int(n[-1:])*4+9
         case 'Greedy':
             return 13
-        case 'Greedy5':
-            return 29
         case 'ImageLike':
             return 125
         case _:

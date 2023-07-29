@@ -18,7 +18,7 @@ from codinglab_utils import calculate_net_reward
 
 
 class Environment(object):
-    def __init__(self, variant, data_dir):
+    def __init__(self, variant, data_dir, n):
         self.variant = variant
         self.vertical_cell_count = 5
         self.horizontal_cell_count = 5
@@ -29,6 +29,7 @@ class Environment(object):
         self.max_response_time = 15 if self.variant == 2 else 10
         self.reward = 25 if self.variant == 2 else 15
         self.data_dir = data_dir
+        self.n = n
 
         self.training_episodes = pd.read_csv(self.data_dir + f'/variant_{self.variant}/training_episodes.csv')
         self.training_episodes = self.training_episodes.training_episodes.tolist()
@@ -189,7 +190,7 @@ class Environment(object):
                 item_distances[4*n+3] = np.maximum(-1, item_loc[1] - self.agent_loc[1])
 
         # select first five item distances
-        first_five = item_distances[:20]
+        first_five = item_distances[:(4*n)]
 
         observation = [dist_up, dist_down, dist_left, dist_right,
                         dist_up_target, dist_down_target, dist_left_target, dist_right_target]
