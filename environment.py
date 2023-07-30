@@ -166,6 +166,7 @@ class Environment(object):
 
         
         item_distances = list(np.repeat(-1, 100))
+
         if len(self.item_times) > 0:
 
             # create a list (eligible) with all items that can be reached before they disappear
@@ -183,18 +184,18 @@ class Environment(object):
             eligible_sorted = sorted(eligible, key=lambda x: calculate_net_reward(reward=self.reward, item_loc=x, agent_loc=self.agent_loc, target_loc=self.target_loc))
 
             # save agent-item directional distances of all items sorted by net reward
-            for n, item_loc in enumerate(eligible_sorted):
-                item_distances[4*n] = np.maximum(-1, self.agent_loc[0] - item_loc[0])
-                item_distances[4*n+1] = np.maximum(-1, item_loc[0] - self.agent_loc[0])
-                item_distances[4*n+2] = np.maximum(-1, self.agent_loc[1] - item_loc[1])
-                item_distances[4*n+3] = np.maximum(-1, item_loc[1] - self.agent_loc[1])
+            for count, item_loc in enumerate(eligible_sorted):
+                item_distances[4*count] = np.maximum(-1, self.agent_loc[0] - item_loc[0])
+                item_distances[4*count+1] = np.maximum(-1, item_loc[0] - self.agent_loc[0])
+                item_distances[4*count+2] = np.maximum(-1, self.agent_loc[1] - item_loc[1])
+                item_distances[4*count+3] = np.maximum(-1, item_loc[1] - self.agent_loc[1])
 
         # select first five item distances
-        first_five = item_distances[:(4*n)]
+        first_n = item_distances[:(4*self.n)]
 
         observation = [dist_up, dist_down, dist_left, dist_right,
                         dist_up_target, dist_down_target, dist_left_target, dist_right_target]
-        observation.extend(first_five)
+        observation.extend(first_n)
         observation.extend([self.agent_capacity - self.agent_load])
 
         # return agent-wall, agent-target, agent-next_item distances plus the remaining agent capacity as state

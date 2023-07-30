@@ -22,7 +22,7 @@ def make_environment(environment_name, variant, data_dir):
 
     match environment_name:
         case s if s.startswith('NGreedy'):
-            return GreedyN(variant, data_dir, s[-1:])
+            return GreedyN(variant, data_dir, int(s[-1:]))
         case 'Greedy':
             return Greedy(variant, data_dir)
         case 'ImageLike':
