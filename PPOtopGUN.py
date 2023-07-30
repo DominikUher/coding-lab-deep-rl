@@ -151,11 +151,20 @@ class PPO:
                 
             elif mean_reward > self.best_validation_score:
                     self.best_validation_score = mean_reward
+                    best_validation_score_str = '%.2f' % self.best_validation_score
                     self.best_validation_episode = self.env.episode
                     self.best_episode_actions = action_history
 
         if mode == 'validation':
                 return np.mean(reward_history)
+    
+        if mode == 'testing':
+            test_score = np.mean(reward_history)
+            with open('./output/.test_performance.txt', 'a') as output:
+                output.write(f'Mean testing score of {test_score}\n')
+                output.write(f'Best testing score of {best_validation_score_str} achieved in episode {self.best_validation_episode}\n')
+                output.write(f'Actions taken during best testing episode: {self.best_episode_actions}\n\n')
+            return
         
         f = open(f'./output/PPO_v{self.variant}_s{best_validation_score_str}_obs{self.obs}_lr{self.lr}_lb{self.lbd}_g{self.gamma}_e{self.epsilon}.txt', 'w')
         f.write(f'Best score of {best_validation_score_str} achieved after training {self.best_validation_episode} episodes\n')
@@ -163,6 +172,8 @@ class PPO:
         f.writelines(f'Episode number of best validation run: {self.best_validation_episode}\n\n')
         f.writelines(f'Actions taken in best validation run: {self.best_episode_actions}')
         f.close()
+
+        self.run_ppo('testing')
         
 
 

@@ -40,6 +40,7 @@ class Environment(object):
 
         self.remaining_training_episodes = deepcopy(self.training_episodes)
         self.validation_episode_counter = 0
+        self.test_episodes_counter = 0
 
         if self.variant == 0 or self.variant == 2:
             self.agent_capacity = 1
@@ -72,8 +73,9 @@ class Environment(object):
         self.item_times = []
 
         if mode == "testing":
-            episode = self.test_episodes[0]
-            self.test_episodes.remove(episode)
+            episode = self.test_episodes[self.test_episodes_counter]
+            self.test_episodes_counter = (self.test_episodes_counter + 1) % 100
+
         elif mode == "validation":
             episode = self.validation_episodes[self.validation_episode_counter]
             self.validation_episode_counter = (self.validation_episode_counter + 1) % 100

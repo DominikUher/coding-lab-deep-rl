@@ -31,7 +31,7 @@ algorithm_parameters = {    # Choose hyperparameters here
     'variant': variant,
     'input_shape': calculate_input_shape(observation),
     'hidden_size': 256,
-    'early_stopping': 20,
+    'early_stopping': 3,
     'validation_after_episodes': 5,
     'lr_actor': 0.001,
     'lr_critic_1': 0.005,
@@ -59,9 +59,6 @@ def line_search(paramater_name, values):
         if score > best_score:
             best_score = score
             best_parameters[paramater_name] = value
-            test_score = algorithm.run_ppo('testing')
-            with open('./output/.test_performance.txt', 'a') as test_scores:
-                test_scores.write(f'Score of {test_score} achieved with parameters: {best_parameters}')
 
 
 line_search('return_lambda', [0.875, 0.9, 0.95, 0.99])
