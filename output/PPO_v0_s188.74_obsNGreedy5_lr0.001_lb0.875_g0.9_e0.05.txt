@@ -1,0 +1,6 @@
+Best score of 188.74 achieved after training 186 episodes
+Chosen hyperparameters: {'seed': 10, 'observation': 'NGreedy5', 'environment': <environment.Environment object at 0x000002549E35FFD0>, 'variant': 0, 'input_shape': 29, 'hidden_size': 256, 'early_stopping': 20, 'validation_after_episodes': 5, 'lr_actor': 0.001, 'lr_critic_1': 0.0001, 'lr_critic_2': 0.0001, 'return_lambda': 0.875, 'gamma': 0.9, 'clip_epsilon': 0.05, 'episode_steps': 200, 'no_of_actors': 5, 'actor_updates_per_episode': 100, 'critic_updates_per_episode': 100, 'clip_annealing_factor': 0.99}
+
+Episode number of best validation run: 186
+
+Actions taken in best validation run: [0, 3, 2, 2, 2, 4, 1, 4, 4, 2, 3, 4, 1, 3, 3, 2, 1, 1, 4, 4, 2, 3, 1, 4, 2, 2, 2, 2, 0, 0, 4, 4, 4, 4, 1, 3, 2, 2, 3, 2, 4, 4, 4, 1, 1, 2, 3, 4, 1, 2, 2, 4, 3, 4, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 3, 1, 1, 2, 3, 4, 1, 4, 4, 2, 2, 2, 3, 3, 4, 1, 4, 4, 1, 3, 3, 1, 1, 4, 4, 4, 3, 3, 2, 2, 1, 4, 4, 1, 1, 3, 2, 2, 3, 2, 1, 4, 4, 4, 4, 4, 4, 2, 2, 2, 4, 4, 4, 2, 4, 2, 3, 2, 2, 4, 4, 4, 1, 2, 4, 4, 1, 1, 3, 3, 4, 0, 0, 0, 1, 3, 4, 0, 4, 4, 4, 2, 2, 4, 4, 4, 0, 2, 2, 2, 4, 4, 4, 2, 2, 4, 4, 2, 2, 3, 4, 1, 4, 4, 2, 2, 3, 3, 1, 1, 4, 4, 2, 1, 4, 3, 3, 1, 1, 2, 1, 3, 4, 3, 3, 3, 2, 2, 2, 1, 0, 4, 4, 4, 1, 4]
