@@ -24,6 +24,7 @@ class PPO:
         self.validation_after_episodes = hyperparameters['validation_after_episodes']
         self.best_score = -np.inf
         self.best_validation_score = -np.inf
+        self.worst_score = np.inf
         os.environ['PYTHONHASHSEED'] = str(seed)
         tf.random.set_seed(seed)
         np.random.seed(seed)
@@ -43,6 +44,9 @@ class PPO:
         self.run_ppo(mode='training')
 
     def run_ppo(self, mode='validation'):
+        self.best_score = -np.inf
+        self.best_validation_score = -np.inf
+        self.worst_score = np.inf
         training = mode == 'training'
         episodes_without_improvement = 0
 
@@ -150,10 +154,16 @@ class PPO:
                     f' | actor loss: {actor_loss_str} | actions: {actions_count}')
                 
             elif mean_reward > self.best_validation_score:
-                    self.best_validation_score = mean_reward
-                    best_validation_score_str = '%.2f' % self.best_validation_score
-                    self.best_validation_episode = self.env.episode
-                    self.best_episode_actions = action_history
+                self.best_validation_score = mean_reward
+                best_validation_score_str = '%.2f' % self.best_validation_score
+                self.best_validation_episode = self.env.episode
+                self.best_episode_actions = action_history
+
+            elif mean_reward < self.worst_score:
+                self.worst_score = mean_reward
+                worst_score_str = '%.2f' % self.worst_score
+                self.worst_episode = self.env.episode
+                self.worst_episode_actions = action_history
 
         if mode == 'validation':
                 return np.mean(reward_history)
@@ -164,7 +174,9 @@ class PPO:
                 output.write(f'Testing PPO with parameters: {self.hyperparameters}\n')
                 output.write(f'Mean testing score of {test_score}\n')
                 output.write(f'Best testing score of {best_validation_score_str} achieved in episode {self.best_validation_episode}\n')
-                output.write(f'Actions taken during best testing episode: {self.best_episode_actions}\n\n')
+                output.write(f'Actions taken during best testing episode: {self.best_episode_actions}\n')
+                output.write(f'Worst testing score of {worst_score_str} achieved in episode {self.worst_episode}\n')
+                output.write(f'Actions taken during best testing episode: {self.worst_episode_actions}\n\n')
             return
         
         f = open(f'./output/PPO_v{self.variant}_s{best_validation_score_str}_obs{self.obs}_lr{self.lr}_lb{self.lbd}_g{self.gamma}_e{self.epsilon}.txt', 'w')
