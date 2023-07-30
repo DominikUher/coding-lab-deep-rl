@@ -17,7 +17,7 @@ data_dir = './data'         # Only change if data directory changed
 variant = 0                 # Possible values: 0, 1, 2
 observation = 'NGreedy5'    # Possible values: 'Greedy', 'Neutral', 'ImageLike', 'NGreedyX' (with X in [1-9])
 algorithm_name = 'PPO'      # Possible values: 'PPO', 'CNN_PPO'
-algorithm_improvements = {  # Choose which improvements to use
+algorithm_improvements = {  # Choose which improvements to use (to be implemented)
     'clip_ratio_annealing': True,
     'tanh_activations': True,
     'boltzmann_exploration': False,
