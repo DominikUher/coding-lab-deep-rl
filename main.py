@@ -15,7 +15,7 @@ tf.random.set_seed(seed)
 # Declaring algorithm and environment parameters
 data_dir = './data'         # Only change if data directory changed
 variant = 0                 # Possible values: 0, 1, 2
-observation = 'NGreedy5'    # Possible values: 'Greedy', 'Neutral', 'ImageLike', 'NGreedyX' (with X in [1-9])
+observation = 'NGreedy3'    # Possible values: 'Greedy', 'Neutral', 'ImageLike', 'NGreedyX' (with X in [1-9])
 algorithm_name = 'PPO'      # Possible values: 'PPO', 'CNN_PPO'
 algorithm_improvements = {  # Choose which improvements to use (to be implemented)
     'clip_ratio_annealing': True,
@@ -40,7 +40,7 @@ algorithm_parameters = {    # Choose hyperparameters here
     'gamma': 0.9,
     'clip_epsilon': 0.05,
     'episode_steps': 200,
-    'no_of_actors': 100,
+    'no_of_actors': 10,
     'actor_updates_per_episode': 100,
     'critic_updates_per_episode': 100,
     'clip_annealing_factor': 0.99
@@ -50,8 +50,8 @@ best_parameters = algorithm_parameters
 
 def line_search(paramater_name, values):
     print(f'Now searching for best value of {paramater_name}')
+    best_score = -np.inf
     for value in values:
-        best_score = -np.inf
         algorithm_parameters[paramater_name] = value
         algorithm = make_algorithm(algorithm_name, best_parameters, algorithm_improvements)
         algorithm.train()
@@ -59,7 +59,9 @@ def line_search(paramater_name, values):
         if score > best_score:
             best_score = score
             best_parameters[paramater_name] = value
+            test_score = algorithm.run_ppo('testing')
+            with open('./output/.test_performance.txt', 'a') as test_scores:
+                test_scores.write(f'Score of {test_score} achieved with parameters: {best_parameters}')
 
-line_search('lr_critic_1', [0.0001, 0.0005, 0.001, 0.005])
-line_search('lr_critic_2', [0.0001, 0.0005, 0.001, 0.005])
-line_search('no_of_actors', [1, 10, 100])
+
+line_search('return_lambda', [0.875, 0.9, 0.95, 0.99])
