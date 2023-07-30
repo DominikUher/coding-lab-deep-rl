@@ -33,10 +33,10 @@ algorithm_parameters = {    # Choose hyperparameters here
     'hidden_size': 256,
     'early_stopping': 20,
     'validation_after_episodes': 5,
-    'lr_actor': 0.0001,
+    'lr_actor': 0.001,
     'lr_critic_1': 0.0001,
     'lr_critic_2': 0.0001,
-    'return_lambda': 0.75,
+    'return_lambda': 0.875,
     'gamma': 0.9,
     'clip_epsilon': 0.05,
     'episode_steps': 200,
@@ -60,14 +60,6 @@ def line_search(paramater_name, values):
             best_score = score
             best_parameters[paramater_name] = value
 
-line_search('actor_updates_per_episode', [1, 10, 100])
-line_search('critic_updates_per_episode', [1, 10, 100])
-line_search('lr_actor', [0.00001, 0.0001, 0.001])
-line_search('lr_critic1', [0.00001, 0.0001, 0.001])
-line_search('lr_critic2', [0.00001, 0.0001, 0.001])
-line_search('return_lambda', [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875])
-line_search('gamma', [0.75, 0.875, 0.9, 0.95, 0.99])
-line_search('clip_epsilon', [0.01, 0.05, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875])
-line_search('clip_annealing_factor', [0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 0.9, 0.95, 0.99])
-line_search('hidden_size', [32, 64, 128, 256, 512])
+line_search('lr_critic_1', [0.0001, 0.0005, 0.001, 0.005])
+line_search('lr_critic_2', [0.0001, 0.0005, 0.001, 0.005])
 line_search('no_of_actors', [1, 10, 100])
