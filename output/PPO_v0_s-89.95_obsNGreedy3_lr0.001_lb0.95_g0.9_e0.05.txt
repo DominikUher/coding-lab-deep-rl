@@ -1,5 +1,5 @@
 Best score of -89.95 achieved after training 118 episodes
-Chosen hyperparameters: {'seed': 10, 'observation': 'NGreedy3', 'environment': <environment.Environment object at 0x000002ABC7F5FFD0>, 'variant': 0, 'input_shape': 21, 'hidden_size': 256, 'early_stopping': 3, 'validation_after_episodes': 5, 'lr_actor': 0.001, 'lr_critic_1': 0.005, 'lr_critic_2': 0.005, 'return_lambda': 0.95, 'gamma': 0.9, 'clip_epsilon': 0.05, 'episode_steps': 200, 'no_of_actors': 10, 'actor_updates_per_episode': 100, 'critic_updates_per_episode': 100, 'clip_annealing_factor': 0.99}
+Chosen hyperparameters: {'seed': 10, 'observation': 'NGreedy3', 'environment': <environment.Environment object at 0x000001F78B80FFD0>, 'variant': 0, 'input_shape': 21, 'hidden_size': 256, 'early_stopping': 3, 'validation_after_episodes': 5, 'lr_actor': 0.001, 'lr_critic_1': 0.005, 'lr_critic_2': 0.005, 'return_lambda': 0.95, 'gamma': 0.9, 'clip_epsilon': 0.05, 'episode_steps': 200, 'no_of_actors': 10, 'actor_updates_per_episode': 100, 'critic_updates_per_episode': 100, 'clip_annealing_factor': 0.99}
 
 Episode number of best validation run: 118
 

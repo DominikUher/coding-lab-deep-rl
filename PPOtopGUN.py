@@ -161,6 +161,7 @@ class PPO:
         if mode == 'testing':
             test_score = np.mean(reward_history)
             with open('./output/.test_performance.txt', 'a') as output:
+                output.write(f'Testing PPO with parameters: {self.hyperparameters}\n')
                 output.write(f'Mean testing score of {test_score}\n')
                 output.write(f'Best testing score of {best_validation_score_str} achieved in episode {self.best_validation_episode}\n')
                 output.write(f'Actions taken during best testing episode: {self.best_episode_actions}\n\n')
