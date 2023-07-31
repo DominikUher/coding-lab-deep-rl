@@ -176,7 +176,7 @@ class PPO:
                 output.write(f'Best testing score of {best_validation_score_str} achieved in episode {self.best_validation_episode}\n')
                 output.write(f'Actions taken during best testing episode: {self.best_episode_actions}\n')
                 output.write(f'Worst testing score of {worst_score_str} achieved in episode {self.worst_episode}\n')
-                output.write(f'Actions taken during best testing episode: {self.worst_episode_actions}\n\n')
+                output.write(f'Actions taken during worst testing episode: {self.worst_episode_actions}\n\n')
             return
         
         f = open(f'./output/PPO_v{self.variant}_s{best_validation_score_str}_obs{self.obs}_lr{self.lr}_lb{self.lbd}_g{self.gamma}_e{self.epsilon}.txt', 'w')
