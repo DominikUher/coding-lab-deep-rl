@@ -5,8 +5,8 @@ import random
 # make sure to initialize the environment so that the (validation) episodes are the exact same as
 # the ones that achieved the high score
 from environment_CNN_moving import Environment
-
-env = Environment(variant=0, data_dir='./data')
+variant = 2
+env = Environment(variant=variant, data_dir='./data')
 
 
 def visualize_episode(actions: list(), startAt):
@@ -45,29 +45,29 @@ def draw_grid(agent_location, target_location, item_locations, item_times, fig, 
         color = (c1, c2 * item_time, c3 * item_time)
         rect = plt.Rectangle((item_x, item_y), 1, 1, facecolor=color, figure=fig)
         ax.add_patch(rect)
+    if variant == 2:
+        ax.add_patch(plt.Rectangle((1, 0), 1, 1, facecolor=(0, 0, 0), figure=fig))
+        ax.add_patch(plt.Rectangle((1, 1), 1, 1, facecolor=(0, 0, 0), figure=fig))
+        ax.add_patch(plt.Rectangle((1, 2), 1, 1, facecolor=(0, 0, 0), figure=fig))
+        ax.add_patch(plt.Rectangle((3, 1), 1, 1, facecolor=(0, 0, 0), figure=fig))
+        ax.add_patch(plt.Rectangle((3, 2), 1, 1, facecolor=(0, 0, 0), figure=fig))
+        ax.add_patch(plt.Rectangle((3, 3), 1, 1, facecolor=(0, 0, 0), figure=fig))
+        ax.add_patch(plt.Rectangle((3, 4), 1, 1, facecolor=(0, 0, 0), figure=fig))
 
-    target_rect = plt.Rectangle((target_x, target_y), 1, 1, facecolor=(0.2, 0.2, 0.2), figure=fig)
+    target_rect = plt.Rectangle((target_x, target_y), 1, 1, facecolor=(1, 216/255, 0), figure=fig)
     ax.add_patch(target_rect)
 
-    agent_rect = plt.Rectangle((agent_x + 0.25, agent_y + 0.25), 0.5, 0.5, facecolor="blue", figure=fig)
+    agent_rect = plt.Circle((agent_x + 0.5, agent_y + 0.5), 0.25, facecolor="blue", figure=fig)
     ax.add_patch(agent_rect)
 
     plt.xlim(0, 5)
     plt.ylim(0, 5)
+    plt.gca().invert_yaxis()
+    fig.set_size_inches((5, 5))
     plt.gca().set_aspect('equal', adjustable='box')
 
 
 if __name__ == '__main__':
     # example actions, replace with yours
-    actions = [0, 4, 2, 2, 1, 2, 4, 4, 4, 3, 3, 3, 1, 1, 3, 3, 1, 1, 0,
-               2, 2, 4, 4, 2, 1, 1, 3, 4, 3, 4, 0, 0, 4, 2, 3, 4, 1, 2,
-               2, 1, 4, 4, 3, 2, 2, 4, 4, 0, 0, 0, 4, 4, 2, 2, 1, 4, 3,
-               4, 2, 4, 2, 2, 1, 4, 3, 4, 2, 1, 4, 3, 2, 4, 2, 2, 2, 2,
-               4, 4, 4, 4, 2, 4, 1, 4, 2, 2, 1, 3, 4, 4, 3, 4, 0, 0, 3,
-               2, 4, 1, 0, 0, 1, 2, 1, 3, 4, 3, 4, 1, 4, 1, 2, 2, 4, 4,
-               3, 3, 4, 3, 1, 2, 2, 1, 4, 3, 4, 2, 2, 1, 2, 4, 4, 4, 3,
-               1, 2, 1, 2, 2, 4, 4, 4, 1, 3, 3, 3, 2, 1, 4, 2, 4, 0, 0,
-               0, 2, 2, 1, 2, 2, 4, 4, 4, 4, 3, 3, 2, 2, 4, 4, 1, 2, 4,
-               2, 2, 2, 1, 2, 4, 3, 4, 4, 4, 0, 0, 4, 4, 4, 0, 0, 0, 3,
-               2, 2, 4, 1, 4, 1, 3, 0, 4, 4]
-    visualize_episode(actions, 55)
+    actions = [0, 0, 0, 2, 4, 3, 2, 2, 1, 1, 3, 3, 4, 4, 1, 3, 2, 2, 1, 1, 3, 3, 4, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 4, 2, 2, 4, 4, 4, 4, 4, 2, 3, 3, 2, 2, 4, 4, 1, 1, 3, 2, 2, 1, 1, 3, 3, 4, 4, 1, 4, 0, 3, 2, 2, 1, 3, 4, 4, 1, 3, 2, 3, 2, 1, 4, 4, 1, 4, 0, 0, 2, 0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 4, 4, 4, 4, 2, 0, 2, 0, 4, 0, 4, 0, 3, 2, 2, 4, 4, 1, 0, 0, 2, 4, 0, 4, 2, 4, 2, 4, 4, 4, 4, 4, 4, 0, 2, 2, 0, 4, 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 2, 4, 4, 3, 4, 4, 4, 3, 3, 1, 4, 0, 4, 4, 0, 0, 0, 4, 1, 4, 4, 4, 4, 0, 3, 2, 2]
+    visualize_episode(actions, 75)
