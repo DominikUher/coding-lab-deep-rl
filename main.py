@@ -65,4 +65,4 @@ def line_search(paramater_name, values):
 
 
 # in this case, we only test one value (10) for no_of_actors -> "testing" is trivial
-line_search('no_of_actors', [10])
+line_search('no_of_actors', [15])
