@@ -1,3 +1,4 @@
+import copy
 from collections import deque
 import os
 import tensorflow as tf
@@ -8,9 +9,12 @@ import random
 class PPO:
     def __init__(self, seed, env, variant, input_shape, hidden_size, early_stopping, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
                  no_of_actors, actor_updates_per_episode, critic_updates_per_episode, clip_annealing_factor, hyperparameters):
-        self.agent = PPOAgent(variant, input_shape, hidden_size, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors)
+        cnn = hyperparameters['cnn']
+        self.agent = PPOAgent(input_shape, hidden_size, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors, cnn)
         self.hyperparameters = hyperparameters
-        self.env = env
+        # we have to create a separate environment for each actor
+        self.reward_shaping = self.hyperparameters['reward_shaping']
+        self.envs = [copy.deepcopy(env) for _ in range(no_of_actors)]
         self.variant = variant
         self.lr = lr_actor
         self.lbd = return_lambda
@@ -50,6 +54,8 @@ class PPO:
         training = mode == 'training'
         episodes_without_improvement = 0
 
+        no_actors = self.agent.no_of_actors if training else 1
+
         if training:
             no_of_episodes = 800
         else:
@@ -58,7 +64,6 @@ class PPO:
         reward_history = deque(maxlen=no_of_episodes)
 
         for episode in range(no_of_episodes):
-            no_actors = self.agent.no_of_actors if training else 1
             if (episodes_without_improvement >= self.early_stopping) and training:
                 break
             self.agent.clip_epsilon *= self.clip_annealing_factor   # adaptive clip epsilon
@@ -85,7 +90,7 @@ class PPO:
 
             for n in range(no_actors):
                 episode_reward = 0
-                state = self.env.reset(mode)
+                state = self.envs[n].reset(mode)
                 state = tf.reshape(state, shape=(1, self.agent.no_of_features))
 
                 for t in range(self.agent.episode_steps):
@@ -93,14 +98,23 @@ class PPO:
                     action_counter[action] += 1
                     if not training:
                         action_history.append(action.numpy())
-                    reward, next_state, done = self.env.step(action)
+                    # previous agent location for reward flag
+                    prev_loc = self.envs[n].agent_loc
+                    reward, next_state, done = self.envs[n].step(action)
+                    # new location
+                    new_loc = self.envs[n].agent_loc
                     next_state = tf.reshape(next_state, shape=(1, self.agent.no_of_features))
 
                     if training:
+                        if self.reward_shaping and prev_loc == new_loc and action != 0:
+                            reward_flag = -1
+                        else:
+                            reward_flag = 0
+
                         v_value = self.agent.evaluate_state(state)
                         state_buffer[n, t] = state
                         action_buffer[n, t] = action
-                        reward_buffer[n, t] = reward
+                        reward_buffer[n, t] = reward + reward_flag
                         next_state_buffer[n, t] = next_state
                         done_buffer[n, t] = done
                         action_probs_buffer[n, t] = action_prob
@@ -114,7 +128,7 @@ class PPO:
                         break
 
                 if not training:
-                    episode_history.append(self.env.episode)
+                    episode_history.append(self.envs[n].episode)
                     
             if training:
 
@@ -156,13 +170,13 @@ class PPO:
             elif mean_reward > self.best_validation_score:
                 self.best_validation_score = mean_reward
                 best_validation_score_str = '%.2f' % self.best_validation_score
-                self.best_validation_episode = self.env.episode
+                self.best_validation_episode = self.envs[n].episode
                 self.best_episode_actions = action_history
 
             elif mean_reward < self.worst_score:
                 self.worst_score = mean_reward
                 worst_score_str = '%.2f' % self.worst_score
-                self.worst_episode = self.env.episode
+                self.worst_episode = self.envs[n].episode
                 self.worst_episode_actions = action_history
 
         if mode == 'validation':
@@ -189,11 +203,9 @@ class PPO:
         self.run_ppo('testing')
         
 
-
 class PPOAgent:
-    def __init__(self, variant, input_shape, hidden_size, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
-                 no_of_actors):
-        #self.no_of_features = [13, 19, 0][variant]  # depends on the number of features
+    def __init__(self, input_shape, hidden_size, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps,
+                 no_of_actors, cnn):
         self.no_of_features = input_shape
         self.no_of_actions = 5
         self.hidden_size = hidden_size
@@ -206,17 +218,26 @@ class PPOAgent:
         self.episode_steps = episode_steps
 
         # defining the actor
-        self.actor = self.create_nn('actor')
+        if not cnn:
+            self.actor = self.create_nn('actor')
+        else:
+            self.actor = self.create_cnn('actor')
         self.lr_actor = lr_actor
         self.actor_optimizer = tf.keras.optimizers.legacy.Adam(learning_rate=self.lr_actor)
 
         # defining the first critic
-        self.critic_1 = self.create_nn('critic')
+        if not cnn:
+            self.critic_1 = self.create_nn('critic')
+        else:
+            self.critic_1 = self.create_cnn('critic')
         self.lr_critic_1 = lr_critic_1
         self.critic_1_optimizer = tf.keras.optimizers.legacy.Adam(learning_rate=self.lr_critic_1)
 
         # defining the second critic
-        self.critic_2 = self.create_nn('critic')
+        if not cnn:
+            self.critic_2 = self.create_nn('critic')
+        else:
+            self.critic_2 = self.create_cnn('critic')
         self.lr_critic_2 = lr_critic_2
         self.critic_2_optimizer = tf.keras.optimizers.legacy.Adam(learning_rate=self.lr_critic_2)
 
@@ -231,6 +252,19 @@ class PPOAgent:
             output = tf.squeeze(output, axis=1)
 
         return tf.keras.Model(inputs=input_layer, outputs=output)
+
+    def create_cnn(self, nn_type):
+        inputs = tf.keras.layers.Input(shape=(self.no_of_features,), dtype=tf.float32)
+        flattened_layer = tf.keras.layers.Flatten()(inputs)
+        fc_layer_1 = tf.keras.layers.Dense(units=64, activation='tanh')(flattened_layer)
+        fc_layer_2 = tf.keras.layers.Dense(units=128, activation='tanh')(fc_layer_1)
+        fc_layer_3 = tf.keras.layers.Dense(units=256, activation='tanh')(fc_layer_2)
+        fc_layer_4 = tf.keras.layers.Dense(units=512, activation='tanh')(fc_layer_3)
+        if nn_type == 'critic':
+            outputs = tf.keras.layers.Dense(1, activation=None)(fc_layer_4)
+        if nn_type == 'actor':
+            outputs = tf.keras.layers.Dense(self.no_of_actions, activation=None)(fc_layer_3)
+        return tf.keras.models.Model(inputs=inputs, outputs=outputs)
 
     def calculate_actor_update_prerequisites(self, no_of_actors, reward_buffer, value_buffer):
         return_buffer = np.zeros(shape=(self.no_of_actors, self.episode_steps, 1), dtype=np.float32)
@@ -259,7 +293,8 @@ class PPOAgent:
             loss = -tf.reduce_mean(clipped_ratio * advantages)
 
         gradient = tape.gradient(loss, self.actor.trainable_variables)
-        self.actor_optimizer.apply_gradients(zip(gradient, self.actor.trainable_variables))
+        clipped_gradient = [tf.clip_by_norm(t=layer, clip_norm=2.0) for layer in gradient]
+        self.actor_optimizer.apply_gradients(zip(clipped_gradient, self.actor.trainable_variables))
 
         return loss
 
