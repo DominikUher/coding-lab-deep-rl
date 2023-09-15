@@ -68,12 +68,15 @@ def line_search(paramater_name, values):
 # test the policy. weight paths can be replaced with any suitable weights
 def test_policy(mode='validation'):
     algorithm = make_algorithm(algorithm_name, best_parameters, algorithm_improvements)
-    algorithm.agent.actor.load_weights(f"actor_weights_{variant}_{observation}")
-    algorithm.agent.critic_1.load_weights(f"critic_1_weights_{variant}_{observation}")
-    algorithm.agent.critic_2.load_weights(f"critic_2_weights_{variant}_{observation}")
+    algorithm.agent.actor.load_weights(f"actor_weights_var_{variant}_{observation}")
+    algorithm.agent.critic_1.load_weights(f"critic_1_weights_var_{variant}_{observation}")
+    algorithm.agent.critic_2.load_weights(f"critic_2_weights_var_{variant}_{observation}")
     mean_reward = algorithm.run_ppo(mode=mode)
     print(f"mean {mode} reward: {mean_reward}")
 
 
 # in this case, we only test one value (15) for no_of_actors -> "testing" is trivial, this is basically regular training
 line_search('no_of_actors', [15])
+
+# test the policy. make sure that the path in the method test_policy() is the one the weights have been saved to
+#test_policy()
