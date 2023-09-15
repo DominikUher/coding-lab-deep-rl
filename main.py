@@ -14,8 +14,8 @@ tf.random.set_seed(seed)
 
 # Declaring algorithm and environment parameters
 data_dir = './data'         # Only change if data directory changed
-variant = 0                 # Possible values: 0, 1, 2
-observation = 'NGreedy5'    # Possible values: 'Greedy', 'ImageLike', 'NGreedyX' (with X in [1-9])
+variant = 2                 # Possible values: 0, 1, 2
+observation = 'ImageLike'   # Possible values: 'Greedy', 'ImageLike', 'NGreedyX' (with X in [1-9])
 algorithm_name = 'PPO'      # Possible values: 'PPO', 'CNN_PPO'
 algorithm_improvements = {  # Choose which improvements to use (to be implemented)
     'clip_ratio_annealing': True,
@@ -65,10 +65,6 @@ def line_search(paramater_name, values):
             best_parameters[paramater_name] = value
 
 
-# in this case, we only test one value (15) for no_of_actors -> "testing" is trivial, this is basically regular training
-line_search('no_of_actors', [15])
-
-
 # test the policy. weight paths can be replaced with any suitable weights
 def test_policy(mode='validation'):
     algorithm = make_algorithm(algorithm_name, best_parameters, algorithm_improvements)
@@ -77,3 +73,7 @@ def test_policy(mode='validation'):
     algorithm.agent.critic_2.load_weights(f"critic_2_weights_{variant}_{observation}")
     mean_reward = algorithm.run_ppo(mode=mode)
     print(f"mean {mode} reward: {mean_reward}")
+
+
+# in this case, we only test one value (15) for no_of_actors -> "testing" is trivial, this is basically regular training
+line_search('no_of_actors', [15])

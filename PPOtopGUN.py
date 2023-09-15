@@ -60,9 +60,9 @@ class PPO:
         if training:
             no_of_episodes = 800
             # code commented out - load desired weights for transfer learning
-            self.agent.actor.load_weights("actor_weights_var_1_NGreedy5")
-            self.agent.critic_1.load_weights("critic_1_weights_var_1_NGreedy5")
-            self.agent.critic_2.load_weights("critic_2_weights_var_1_NGreedy5")
+            self.agent.actor.load_weights("actor_weights_var_0_ImageLike")
+            self.agent.critic_1.load_weights("critic_1_weights_var_0_ImageLike")
+            self.agent.critic_2.load_weights("critic_2_weights_var_0_ImageLike")
 
         else:
             no_of_episodes = 100
