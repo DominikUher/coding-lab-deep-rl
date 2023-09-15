@@ -4,4 +4,5 @@ Initial files were provided by the chair.
 
 State representation, algorithm, and hyperparameters can be set through the main.py file, which also starts training and logs results into /output/.
 
-To generate
+State representations: A legacy Greedy representation can be found in environment_dist_possible.py, environment_CNN_moving.py contains the Image-like state representation, environment contains the N-Greedy representation.
+Algorithm: PPOtopGUN contains our final PPO algorithm.
