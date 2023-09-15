@@ -44,8 +44,8 @@ algorithm_parameters = {    # Choose hyperparameters here
     'actor_updates_per_episode': 100,
     'critic_updates_per_episode': 100,
     'clip_annealing_factor': 0.99,
-    'cnn': False,   # do not change, this is legacy code
-    'reward_shaping': True,
+    'cnn': False,               # do not change to True, this is legacy code
+    'reward_shaping': True,     # treat running into walls as normal move, not standing still - reward-wise
     'starting_score': None      # initial best score for transfer learning.
                                 # Enter any number or 'None' if nothing should be specified
 }

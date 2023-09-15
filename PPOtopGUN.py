@@ -181,9 +181,9 @@ class PPO:
                 best_validation_score_str = '%.2f' % self.best_validation_score
                 self.best_validation_episode = self.envs[n].episode
                 self.best_episode_actions = action_history
-                self.agent.actor.save_weights(f'actor_weights_var_{self.variant}')
-                self.agent.critic_1.save_weights(f'critic_1_weights_var_{self.variant}')
-                self.agent.critic_2.save_weights(f'critic_2_weights_var_{self.variant}')
+                self.agent.actor.save_weights(f"actor_weights_var_{self.variant}_{self.hyperparameters['observation']}")
+                self.agent.critic_1.save_weights(f"critic_1_weights_var_{self.variant}_{self.hyperparameters['observation']}")
+                self.agent.critic_2.save_weights(f"critic_2_weights_var_{self.variant}_{self.hyperparameters['observation']}")
 
             elif mean_reward < self.worst_score:
                 self.worst_score = mean_reward
