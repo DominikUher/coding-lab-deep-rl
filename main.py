@@ -46,7 +46,7 @@ algorithm_parameters = {    # Choose hyperparameters here
     'clip_annealing_factor': 0.99,
     'cnn': False,
     'reward_shaping': True,
-    'starting_score': 242   # initial best score for transfer learning. Enter any number or 'None' if nothing should be specified
+    'starting_score': None   # initial best score for transfer learning. Enter any number or 'None' if nothing should be specified
 }
 
 best_parameters = algorithm_parameters
