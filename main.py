@@ -77,7 +77,7 @@ def test_policy(mode='validation'):
 
 
 # in this case, we only test one value (15) for no_of_actors -> "testing" is trivial, this is basically regular training
-#line_search('no_of_actors', [15])
+line_search('no_of_actors', [15])
 
 # test the policy. make sure that the path in the method test_policy() is the one the weights have been saved to
-test_policy()
+#test_policy()
