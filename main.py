@@ -14,7 +14,7 @@ tf.random.set_seed(seed)
 
 # Declaring algorithm and environment parameters
 data_dir = './data'         # Only change if data directory changed
-variant = 2                 # Possible values: 0, 1, 2
+variant = 0                 # Possible values: 0, 1, 2
 observation = 'ImageLike'   # Possible values: 'Greedy', 'ImageLike', 'NGreedyX' (with X in [1-9])
 algorithm_name = 'PPO'      # Possible values: 'PPO', 'CNN_PPO'
 algorithm_improvements = {  # Choose which improvements to use (to be implemented)
@@ -77,7 +77,7 @@ def test_policy(mode='validation'):
 
 
 # in this case, we only test one value (15) for no_of_actors -> "testing" is trivial, this is basically regular training
-line_search('no_of_actors', [15])
+#line_search('no_of_actors', [15])
 
 # test the policy. make sure that the path in the method test_policy() is the one the weights have been saved to
-#test_policy()
+test_policy()
