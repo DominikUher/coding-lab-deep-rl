@@ -14,8 +14,8 @@ tf.random.set_seed(seed)
 
 # Declaring algorithm and environment parameters
 data_dir = './data'         # Only change if data directory changed
-variant = 1                 # Possible values: 0, 1, 2
-observation = 'ImageLike'#'NGreedy1'    # Possible values: 'Greedy', 'ImageLike', 'NGreedyX' (with X in [1-9])
+variant = 2                 # Possible values: 0, 1, 2
+observation = 'NGreedy5'    # Possible values: 'Greedy', 'ImageLike', 'NGreedyX' (with X in [1-9])
 algorithm_name = 'PPO'      # Possible values: 'PPO', 'CNN_PPO'
 algorithm_improvements = {  # Choose which improvements to use (to be implemented)
     'clip_ratio_annealing': True,
@@ -40,12 +40,13 @@ algorithm_parameters = {    # Choose hyperparameters here
     'gamma': 0.9,
     'clip_epsilon': 0.05,
     'episode_steps': 200,
-    'no_of_actors': 10,
+    'no_of_actors': 15,
     'actor_updates_per_episode': 100,
     'critic_updates_per_episode': 100,
     'clip_annealing_factor': 0.99,
     'cnn': False,
-    'reward_shaping': True
+    'reward_shaping': True,
+    'starting_score': 240   # initial best score for transfer learning. Enter any number or 'None' if nothing should be specified
 }
 
 best_parameters = algorithm_parameters

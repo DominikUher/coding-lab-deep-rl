@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def make_algorithm(algorithm_name, hyperparameters, improvements):
     from PPOtopGUN import PPO
     from main_CNN import PPO as CNN_PPO

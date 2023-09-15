@@ -193,7 +193,7 @@ class Environment(object):
                 item_distances[4*count+3] = np.maximum(-1, item_loc[1] - self.agent_loc[1])
 
         # select first five item distances
-        first_n = item_distances[:(4*self.n)]
+        first_n = item_distances[:(4 * self.n)]
 
         observation = [dist_up, dist_down, dist_left, dist_right,
                         dist_up_target, dist_down_target, dist_left_target, dist_right_target]

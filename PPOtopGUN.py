@@ -13,6 +13,7 @@ class PPO:
         self.agent = PPOAgent(input_shape, hidden_size, lr_actor, lr_critic_1, lr_critic_2, return_lambda, gamma, clip_epsilon, episode_steps, no_of_actors, cnn)
         self.hyperparameters = hyperparameters
         # we have to create a separate environment for each actor
+        self.starting_score = hyperparameters['starting_score']
         self.reward_shaping = self.hyperparameters['reward_shaping']
         self.envs = [copy.deepcopy(env) for _ in range(no_of_actors)]
         self.variant = variant
@@ -49,7 +50,7 @@ class PPO:
 
     def run_ppo(self, mode='validation'):
         self.best_score = -np.inf
-        self.best_validation_score = -np.inf
+        self.best_validation_score = -np.inf if self.starting_score is None else self.starting_score
         self.worst_score = np.inf
         training = mode == 'training'
         episodes_without_improvement = 0
@@ -58,6 +59,10 @@ class PPO:
 
         if training:
             no_of_episodes = 800
+            #self.agent.actor.load_weights("actor_weights_var_1")
+            #self.agent.critic_1.load_weights("critic_1_weights_var_1")
+            #self.agent.critic_2.load_weights("critic_2_weights_var_1")
+
         else:
             no_of_episodes = 100
 
@@ -66,6 +71,7 @@ class PPO:
         for episode in range(no_of_episodes):
             if (episodes_without_improvement >= self.early_stopping) and training:
                 break
+
             self.agent.clip_epsilon *= self.clip_annealing_factor   # adaptive clip epsilon
 
             episode_reward_history = np.zeros(shape=no_actors, dtype=np.float32)
@@ -74,8 +80,7 @@ class PPO:
 
             if training:        # before each episode, we initialize the trajectories
                 state_buffer = np.zeros(
-                    shape=(no_actors, self.agent.episode_steps, self.agent.no_of_features),
-                    dtype=np.float32)
+                    shape=(no_actors, self.agent.episode_steps, self.agent.no_of_features), dtype=np.float32)
                 action_buffer = np.zeros(shape=(no_actors, self.agent.episode_steps, 1), dtype=np.int32)
                 reward_buffer = np.zeros(shape=(no_actors, self.agent.episode_steps, 1), dtype=np.float32)
                 next_state_buffer = np.zeros(shape=(no_actors, self.agent.episode_steps, self.agent.no_of_features),
@@ -140,6 +145,16 @@ class PPO:
                     mean_validation_reward = self.run_ppo()
                     mean_validation_reward_str = '%.2f' % mean_validation_reward
 
+                    if mean_validation_reward > self.best_score:
+                        self.best_score = mean_validation_reward
+                        best_validation_score_str = '%.2f' % self.best_score
+                        episodes_without_improvement = 0
+                        self.agent.actor.save_weights(f"actor_weights_var_{self.variant}_{self.hyperparameters['observation']}")
+                        self.agent.critic_1.save_weights(f"critic_1_weights_var_{self.variant}_{self.hyperparameters['observation']}")
+                        self.agent.critic_2.save_weights(f"critic_2_weights_var_{self.variant}_{self.hyperparameters['observation']}")
+                    else:
+                        episodes_without_improvement += 1
+
                 actor_loss = np.zeros(shape=self.actor_updates_per_episode)
                 for i in range(self.actor_updates_per_episode):
                     actor_loss[i] = self.agent.update_actor(states, actions, action_probs, advantages)
@@ -156,13 +171,6 @@ class PPO:
             reward_history.append(mean_reward)
 
             if training:
-                if mean_validation_reward > self.best_score:
-                    self.best_score = mean_validation_reward
-                    best_validation_score_str = '%.2f' % self.best_score
-                    episodes_without_improvement = 0
-                else:
-                    episodes_without_improvement += 1
-                
                 print(
                     f'episode: {episode} | episode reward: {mean_reward_str} | validation reward: {mean_validation_reward_str}'
                     f' | actor loss: {actor_loss_str} | actions: {actions_count}')
@@ -172,6 +180,9 @@ class PPO:
                 best_validation_score_str = '%.2f' % self.best_validation_score
                 self.best_validation_episode = self.envs[n].episode
                 self.best_episode_actions = action_history
+                self.agent.actor.save_weights(f'actor_weights_var_{self.variant}')
+                self.agent.critic_1.save_weights(f'critic_1_weights_var_{self.variant}')
+                self.agent.critic_2.save_weights(f'critic_2_weights_var_{self.variant}')
 
             elif mean_reward < self.worst_score:
                 self.worst_score = mean_reward
@@ -282,6 +293,7 @@ class PPOAgent:
 
     @tf.function
     def update_actor(self, states, actions, action_probs, advantages):
+        # update the policy based on the clipped ratio between new and old policy -> https://spinningup.openai.com/en/latest/algorithms/ppo.html#:~:text=PPO%20is%20an%20on%2Dpolicy,PPO%20supports%20parallelization%20with%20MPI.
         with tf.GradientTape() as tape:
             current_dist = self.actor(states)
             current_log_dist = tf.math.log(current_dist)
@@ -293,6 +305,7 @@ class PPOAgent:
             loss = -tf.reduce_mean(clipped_ratio * advantages)
 
         gradient = tape.gradient(loss, self.actor.trainable_variables)
+        # apply gradient norm clipping to increase numerical stability
         clipped_gradient = [tf.clip_by_norm(t=layer, clip_norm=2.0) for layer in gradient]
         self.actor_optimizer.apply_gradients(zip(clipped_gradient, self.actor.trainable_variables))
 
@@ -300,6 +313,7 @@ class PPOAgent:
 
     @tf.function
     def update_critics(self, state_buffer, return_buffer):
+        # update both critics based on the MSE between estimated V-values and Lambda-returns
         with tf.GradientTape() as tape:
             td_error = 0.5 * (return_buffer - self.critic_1(state_buffer)) ** 2
             critic_1_l = tf.reduce_mean(td_error)
@@ -316,6 +330,7 @@ class PPOAgent:
 
     @tf.function
     def choose_action(self, state):
+        # choose action based on softmax distribution
         action_dist = self.actor(state)
         action = tf.random.categorical(tf.math.log(action_dist), 1)
         action = tf.squeeze(action)
@@ -323,6 +338,7 @@ class PPOAgent:
         return action_prob, action
 
     def sum_function(self, input_var, discount):
+        # sum function for GAE and Lambda-Returns
         n = len(input_var)
         result = np.zeros_like(input_var)
 
@@ -334,6 +350,7 @@ class PPOAgent:
 
     def get_trajectory_data(self, state_buffer, action_buffer, reward_buffer,
                             action_probs_buffer, return_buffer, advantage_buffer):
+        # flatten the buffers to allow for network training
         states = np.reshape(state_buffer, newshape=(-1, self.no_of_features))
         actions = np.reshape(action_buffer, newshape=(-1))
         rewards = np.reshape(reward_buffer, newshape=(-1))
@@ -345,6 +362,7 @@ class PPOAgent:
 
     @tf.function
     def evaluate_state(self, state_buffer):
+        # use the mean between both critics for the V-value estimate for the advantage calculation
         v_1 = self.critic_1(state_buffer)
         v_2 = self.critic_2(state_buffer)
         return tf.reduce_mean([v_1, v_2])

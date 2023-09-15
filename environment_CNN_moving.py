@@ -165,6 +165,11 @@ class Environment(object):
 
         # Set the agent's position in the grid
         grid_1[self.agent_loc[0], self.agent_loc[1]] = 1
+        if self.variant == 2:
+            for i in range(5):
+                for j in range(5):
+                    if (i, j) not in self.eligible_cells:
+                        grid_1[i, j] = -1
 
         grid_2 = np.zeros((5, 5), np.float32)
         # Set the target's position in the grid
@@ -185,7 +190,5 @@ class Environment(object):
 
         # Stack all the channels together to form the state representation
         state = np.stack((grid_1, grid_2, grid_3, grid_4, agent_capacity_channel), axis=-1)
-        #state = np.stack((grid_1, grid_2, grid_4, agent_capacity_channel), axis=-1)
-        #state = np.stack((grid_1, grid_3, grid_4, agent_capacity_channel), axis=-1) #+ 0.01
         state = tf.constant(state, dtype=tf.float32)
         return state
