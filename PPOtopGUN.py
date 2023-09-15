@@ -59,9 +59,10 @@ class PPO:
 
         if training:
             no_of_episodes = 800
-            #self.agent.actor.load_weights("actor_weights_var_1")
-            #self.agent.critic_1.load_weights("critic_1_weights_var_1")
-            #self.agent.critic_2.load_weights("critic_2_weights_var_1")
+            # code commented out - load desired weights for transfer learning
+            self.agent.actor.load_weights("actor_weights_var_1_NGreedy5")
+            self.agent.critic_1.load_weights("critic_1_weights_var_1_NGreedy5")
+            self.agent.critic_2.load_weights("critic_2_weights_var_1_NGreedy5")
 
         else:
             no_of_episodes = 100
@@ -191,7 +192,7 @@ class PPO:
                 self.worst_episode_actions = action_history
 
         if mode == 'validation':
-                return np.mean(reward_history)
+            return np.mean(reward_history)
     
         if mode == 'testing':
             test_score = np.mean(reward_history)
@@ -266,15 +267,15 @@ class PPOAgent:
 
     def create_cnn(self, nn_type):
         inputs = tf.keras.layers.Input(shape=(self.no_of_features,), dtype=tf.float32)
-        flattened_layer = tf.keras.layers.Flatten()(inputs)
-        fc_layer_1 = tf.keras.layers.Dense(units=64, activation='tanh')(flattened_layer)
+        conv_depthwise = tf.keras.layers.DepthwiseConv2D(kernel_size=(3, 3), padding='same', activation='tanh')(inputs)
+        conv_fuse_pixels = tf.keras.layers.Conv2D(filters=16, kernel_size=(1, 1), padding='same', activation='tanh')(conv_depthwise)
+        flattened_layer = tf.keras.layers.Flatten()(conv_fuse_pixels)
+        fc_layer_1 = tf.keras.layers.Dense(units=128, activation='tanh')(flattened_layer)
         fc_layer_2 = tf.keras.layers.Dense(units=128, activation='tanh')(fc_layer_1)
-        fc_layer_3 = tf.keras.layers.Dense(units=256, activation='tanh')(fc_layer_2)
-        fc_layer_4 = tf.keras.layers.Dense(units=512, activation='tanh')(fc_layer_3)
         if nn_type == 'critic':
-            outputs = tf.keras.layers.Dense(1, activation=None)(fc_layer_4)
+            outputs = tf.keras.layers.Dense(1, activation=None)(fc_layer_2)
         if nn_type == 'actor':
-            outputs = tf.keras.layers.Dense(self.no_of_actions, activation=None)(fc_layer_3)
+            outputs = tf.keras.layers.Dense(self.no_of_actions, activation=None)(fc_layer_2)
         return tf.keras.models.Model(inputs=inputs, outputs=outputs)
 
     def calculate_actor_update_prerequisites(self, no_of_actors, reward_buffer, value_buffer):

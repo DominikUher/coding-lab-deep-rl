@@ -1,7 +1,7 @@
 # compute average reward per test episode with trained policy
 
 
-from environment import Environment
+#from environment import Environment
 
 
 def test_policy(env):
@@ -25,6 +25,6 @@ if __name__ == '__main__':
 
     data_dir = ...  # TODO: specify relative path to data directory (e.g., './data', not './data/variant_0')
     variant = ...  # TODO: specify problem variant (0 for base variant, 1 for first extension, 2 for second extension)
-    env = Environment(variant=variant, data_dir=data_dir)  # initialize the environment
+   # env = Environment(variant=variant, data_dir=data_dir)  # initialize the environment
 
-    test_policy(env)  # test the trained policy
+  #  test_policy(env)  # test the trained policy
