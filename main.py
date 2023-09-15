@@ -44,9 +44,10 @@ algorithm_parameters = {    # Choose hyperparameters here
     'actor_updates_per_episode': 100,
     'critic_updates_per_episode': 100,
     'clip_annealing_factor': 0.99,
-    'cnn': False,
+    'cnn': False,   # do not change, this is legacy code
     'reward_shaping': True,
-    'starting_score': None   # initial best score for transfer learning. Enter any number or 'None' if nothing should be specified
+    'starting_score': None      # initial best score for transfer learning.
+                                # Enter any number or 'None' if nothing should be specified
 }
 
 best_parameters = algorithm_parameters

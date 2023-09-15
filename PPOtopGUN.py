@@ -275,7 +275,7 @@ class PPOAgent:
         if nn_type == 'critic':
             outputs = tf.keras.layers.Dense(1, activation=None)(fc_layer_2)
         if nn_type == 'actor':
-            outputs = tf.keras.layers.Dense(self.no_of_actions, activation=None)(fc_layer_2)
+            outputs = tf.keras.layers.Dense(self.no_of_actions, activation='softmax')(fc_layer_2)
         return tf.keras.models.Model(inputs=inputs, outputs=outputs)
 
     def calculate_actor_update_prerequisites(self, no_of_actors, reward_buffer, value_buffer):
